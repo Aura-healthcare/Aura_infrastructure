@@ -1,0 +1,14 @@
+---
+
+- include_role:
+    name: .galaxy/ansible-traefik-in-docker
+  vars:
+    traefik_http_port: 80
+    traefik_http_admin_port: 8080
+    traefik_https_port: 443
+    traefik_le_staging: false
+    traefik_endpoints:
+      influxdb:
+        host: "db.aura.moi.ovh"
+        dest: "http://193.251.229.249:8086"
+        host_gen_cert: true

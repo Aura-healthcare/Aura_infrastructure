@@ -1,0 +1,9 @@
+---
+
+- name: Install role dependencies
+  local_action: command ansible-galaxy install --roles-path ./roles/.galaxy {{ dependency.src }},{{ dependency.version }}
+  with_items: "{{ dependency_roles }}"
+  register: result
+  changed_when: "'is already installed' not in result.stdout"
+  loop_control:
+    loop_var: dependency
