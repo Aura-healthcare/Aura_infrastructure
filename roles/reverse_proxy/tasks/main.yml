@@ -9,6 +9,6 @@
     traefik_le_staging: false
     traefik_endpoints:
       influxdb:
-        host: "db.aura.moi.ovh"
+        host: "db.aura.healthcare"
         dest: "http://193.251.229.249:8086"
         host_gen_cert: true
