@@ -1,5 +1,15 @@
 ---
 
+- name: Get info about jupyterhub container
+  become: true
+  command: docker container inspect jupyterhub
+  changed_when: false
+  register: docker_container_jupyterhub_result
+
+- name: Parse info about jupyterhub container
+  set_fact:
+    docker_container_jupyterhub_info: "{{ docker_container_jupyterhub_result.stdout | from_json | first }}"
+
 - include_role:
     name: .galaxy/ansible-traefik-in-docker
   vars:
@@ -11,4 +21,8 @@
       influxdb:
         host: "db.aura.healthcare"
         dest: "http://193.251.229.249:8086"
+        host_gen_cert: true
+      jupyterhub:
+        host: "explore.aura.healthcare"
+        dest: "http://{{ docker_container_jupyterhub_info.NetworkSettings.IPAddress }}:8000"
         host_gen_cert: true

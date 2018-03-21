@@ -2,4 +2,7 @@
 
 - hosts: all
   roles:
+    - role: jupyter
+      tags: jupyter
     - role: reverse_proxy
+      tags: reverse_proxy

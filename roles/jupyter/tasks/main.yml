@@ -1,0 +1,4 @@
+---
+
+- include_role:
+    name: .galaxy/ansible-jupyter-in-docker
