@@ -6,9 +6,17 @@
   changed_when: false
   register: docker_container_jupyterhub_result
 
-- name: Parse info about jupyterhub container
+- name: Get info about influxdb container
+  become: true
+  command: docker container inspect influxdb
+  changed_when: false
+  register: docker_container_influxdb_result
+
+
+- name: Parse info about containers
   set_fact:
     docker_container_jupyterhub_info: "{{ docker_container_jupyterhub_result.stdout | from_json | first }}"
+    docker_container_influxdb_info: "{{ docker_container_influxdb_result.stdout | from_json | first }}"
 
 - include_role:
     name: .galaxy/ansible-traefik-in-docker
@@ -20,7 +28,7 @@
     traefik_endpoints:
       influxdb:
         host: "db.aura.healthcare"
-        dest: "http://193.251.229.249:8086"
+        dest: "http://{{ docker_container_influxdb_info.NetworkSettings.IPAddress }}:8086"
         host_gen_cert: true
       jupyterhub:
         host: "explore.aura.healthcare"
