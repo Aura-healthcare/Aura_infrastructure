@@ -1,5 +1,7 @@
 ---
 
-host:
+all:
   hosts:
     aura:
+      is_prod: true
+      domain: "aura.healthcare"

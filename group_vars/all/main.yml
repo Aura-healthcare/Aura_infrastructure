@@ -1,6 +1,6 @@
 ---
 
-jupyter_url: 'https://explore.aura.healthcare'
+jupyter_url: 'https://explore.{{ domain }}'
 
 jupyter_authorized_users:
   - BastienF

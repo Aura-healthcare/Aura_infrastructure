@@ -24,13 +24,13 @@
     traefik_http_port: 80
     traefik_http_admin_port: 8080
     traefik_https_port: 443
-    traefik_le_staging: false
+    traefik_le_staging: "{{ is_prod|default(false)|bool }}"
     traefik_endpoints:
       influxdb:
-        host: "db.aura.healthcare"
+        host: "db.{{ domain }}"
         dest: "http://{{ docker_container_influxdb_info.NetworkSettings.IPAddress }}:8086"
         host_gen_cert: true
       jupyterhub:
-        host: "explore.aura.healthcare"
+        host: "explore.{{ domain }}"
         dest: "http://{{ docker_container_jupyterhub_info.NetworkSettings.IPAddress }}:8000"
         host_gen_cert: true
