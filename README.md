@@ -13,6 +13,9 @@ jupyter_client_secret: <GitHub OAuth application Client Secret for JupyterHub>
 
 `ansible-playbook -vv --diff -i inventories/prod.yml install.yml [-t time_series_db -t jupyter -t reverse_proxy]`
 
+### Prerequisites
+ * [Ansible v2.4.2](https://www.ansible.com/)
+
 ## Development environment
 ### Prerequisites
  * [Vagrant v1.8.6](https://www.vagrantup.com/)
