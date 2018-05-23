@@ -15,6 +15,7 @@ jupyter_client_secret: <GitHub OAuth application Client Secret for JupyterHub>
 
 ### Prerequisites
  * [Ansible v2.4.2](https://www.ansible.com/)
+ * The server has to have a user `aura` with following `/etc/sudoers` configuration : `aura  ALL=(ALL)    NOPASSWD:  ALL`
 
 ## Development environment
 ### Prerequisites
