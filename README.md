@@ -22,7 +22,7 @@ jupyter_client_secret: <GitHub OAuth application Client Secret for JupyterHub>
  * [Vagrant v1.8.6](https://www.vagrantup.com/)
  * To have a public ssh key on your local machine on location : `~/.ssh/id_rsa.pub`
 ### tl;dr
- 0. (only once) : `echo "192.168.33.22   db.aura.healthcare.local" >> /etc/hosts`
+ 0. (only once) : `echo -e "192.168.33.22\tdb.aura.healthcare.local" | sudo tee -a /etc/hosts`
  1. `vagrant up`
  2. `ansible-playbook -i inventories/dev.yml install.yml [-t time_series_db -t reverse_proxy, ...]`
  3. Enjoy
