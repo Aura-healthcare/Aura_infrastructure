@@ -2,6 +2,11 @@
 
 - hosts: all
   roles:
+    - role: base/security/firewall
+      tags:
+        - firewall
+        - security
+        - base
     - role: time_series_db
       tags: time_series_db
     - role: jupyter

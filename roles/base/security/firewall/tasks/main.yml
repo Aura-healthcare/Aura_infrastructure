@@ -1,0 +1,72 @@
+---
+
+- name: Install Firewalld
+  become: true
+  package:
+    name: firewalld
+    state: latest
+
+- name: Start service Firewalld
+  become: true
+  service:
+    name: firewalld
+    state: started
+    enabled: true
+
+- name: Open exposed ports
+  become: true
+  firewalld:
+    port: "{{ port }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  with_items: "{{ firewall_exposed_ports }}"
+  loop_control:
+    loop_var: port
+
+- name: Open exposed services
+  become: true
+  firewalld:
+    service: "{{ service }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  with_items: "{{ firewall_exposed_services }}"
+  loop_control:
+    loop_var: service
+
+- name: Get all currently exposed ports
+  become: true
+  command: firewall-cmd --list-ports
+  register: exposed_ports_return
+  changed_when: false
+
+- name: Close all unexpected ports
+  become: true
+  firewalld:
+    port: "{{ port }}"
+    permanent: true
+    immediate: true
+    state: disabled
+  when: port not in firewall_exposed_ports
+  with_items: "{{ exposed_ports_return.stdout.split(' ')|list }}"
+  loop_control:
+    loop_var: port
+
+- name: Get all currently exposed services
+  become: true
+  command: firewall-cmd --list-services
+  register: exposed_services_return
+  changed_when: false
+
+- name: Close all unexpected services
+  become: true
+  firewalld:
+    service: "{{ service }}"
+    permanent: true
+    immediate: true
+    state: disabled
+  when: service not in firewall_exposed_services
+  with_items: "{{ exposed_services_return.stdout.split(' ')|list }}"
+  loop_control:
+    loop_var: service
