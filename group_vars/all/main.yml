@@ -3,7 +3,7 @@
 aura_docker_network: "skynet"
 
 aura_time_series_db_container: "influxdb"
-aura_jupyter_container: "jupyter"
+aura_jupyter_container: "jupyterhub"
 
 jupyter_url: 'https://explore.{{ domain }}'
 
