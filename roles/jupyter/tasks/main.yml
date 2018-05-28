@@ -2,3 +2,7 @@
 
 - include_role:
     name: .galaxy/ansible-jupyter-in-docker
+  vars:
+    jupyter_container_name: "{{ aura_jupyter_container }}"
+    jupyter_docker_networks:
+      - name: "{{ aura_docker_network }}"

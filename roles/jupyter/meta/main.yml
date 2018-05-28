@@ -4,5 +4,5 @@ dependencies:
     - role: base/docker
     - role: base/ansible_dependencies
       dependency_roles:
-        - src: "git+https://github.com/Udyrfrykte/ansible-jupyter-in-docker"
+        - src: "git+https://github.com/BastienF/ansible-jupyter-in-docker"
           version: master

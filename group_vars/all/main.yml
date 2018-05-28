@@ -1,5 +1,10 @@
 ---
 
+aura_docker_network: "skynet"
+
+aura_time_series_db_container: "influxdb"
+aura_jupyter_container: "jupyter"
+
 jupyter_url: 'https://explore.{{ domain }}'
 
 jupyter_authorized_users:
