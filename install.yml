@@ -18,3 +18,5 @@
       tags: jupyter
     - role: reverse_proxy
       tags: reverse_proxy
+    - role: logstash
+      tags: logstash
