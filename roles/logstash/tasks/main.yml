@@ -24,3 +24,12 @@
     logstash_container_name: "{{ aura_logstash_container }}"
     logstash_docker_networks:
       - name: "{{ aura_docker_network }}"
+
+- name: Ansible copy directory with tests files to the remote server
+  copy:
+     src: "{{ test_data_location }}"
+     dest: "/opt/docker-data/{{ aura_logstash_container }}/data"
+     mode: "777"
+     owner: "root"
+     group: "root"
+  become: yes
