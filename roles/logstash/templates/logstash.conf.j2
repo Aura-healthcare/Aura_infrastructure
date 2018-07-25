@@ -1,11 +1,13 @@
 input {
    file {
 	# chemin vers les fichiers sur notre Host
-	path => ["{{logstash_data_container_location}}/*_RrInterval_*.json"]
+	path => ["{{logstash_data_container_location}}/*_RrInterval_*"]
 	type => "RrInterval"
+	codec => "json"
 	# Logstash commence par lire les fichiers qui sont au début
 	start_position => "beginning"
     ignore_older => 0
+    sincedb_path => "/dev/null"
    }
 }
 
@@ -15,7 +17,7 @@ filter{
 		source => "message"
 		# Option pour ignorer le parsing et l'envoi de donnée
 		# si le format json n'est pas respectée
-		skip_on_invalid_json => true
+		#skip_on_invalid_json => true
 	}
 
 	# Splitter le champ data ["time1 value1", "time2 value2", etc ...]
