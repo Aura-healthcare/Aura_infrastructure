@@ -2,4 +2,5 @@
 .galaxy/
 *.retry
 secrets.yml
+install.retry
 .vagrant/
