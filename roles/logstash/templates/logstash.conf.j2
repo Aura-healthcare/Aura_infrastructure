@@ -48,13 +48,13 @@ output {
         id => "RrInterval"
 
       	# allow_time_override => true
-      	# Choisir les valeurs considéées comme des tags par Influxdb
+      	# Choisir les valeurs considérées comme des tags par Influxdb
       	send_as_tags => ["user","device_address"]
 
       	# l'adresse du container Influxdb
         host => "{{logstash_influxDB_ip}}"
 
-      	# Le nom de la base influx créée dans laquelle on souhaite inrer nos données
+      	# Le nom de la base influx créée dans laquelle on souhaite inserer nos données
       	db => "logstash_data"
 
       	# Le nom du measurement de la base influxdb
