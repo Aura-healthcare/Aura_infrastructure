@@ -3,4 +3,4 @@
 logstash_conf_location: "/opt/docker-data/{{ aura_logstash_container }}/conf"
 logstash_data_location: "/opt/docker-data/{{ aura_logstash_container }}/data"
 logstash_data_container_location: "/home/logstash/data"
-logstash_influxDB_ip: "172.18.0.4"
+logstash_influxDB_ip: "172.18.0.2"
