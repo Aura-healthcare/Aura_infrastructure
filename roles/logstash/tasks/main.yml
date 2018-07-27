@@ -11,7 +11,7 @@
     - "{{ logstash_data_location }}"
 
 - name: Create IP_influx variable
-  shell: "sudo docker inspect --format '{''{ .NetworkSettings.IPAddress }''}' influxdb"
+  shell: "sudo docker inspect --format '{''{ .NetworkSettings.IPAddress }''}' {{ influxdb_container_name }}"
   register: logstash_influxDB_ip
 
 - name: "Create configuration"
