@@ -6,3 +6,4 @@ install.retry
 .vagrant/
 install_influxdb.yml
 install_logstash.yml
+.DS_Store
