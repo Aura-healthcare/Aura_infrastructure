@@ -15,8 +15,8 @@ filter{
 
 	json {
 		source => "message"
-		# Option pour ignorer le parsing et l'envoi de donnée
-		# si le format json n'est pas respectée
+		# Option pour ignorer le parsing et l'envoi de donnee
+		# si le format json n'est pas respectee
 		#skip_on_invalid_json => true
 	}
 
@@ -31,7 +31,7 @@ filter{
 		add_field => {"value" => "%{data[1]}"}
 	}
 
-	# Decoder le timestamp et remplacer le @timestamp généré par Logstash par cette valeur
+	# Decoder le timestamp et remplacer le @timestamp que Logstash genere par cette valeur
         date {
         	timezone => "UTC"
         	match => ["time_bis", "ISO8601"]
@@ -52,19 +52,19 @@ output {
       	send_as_tags => ["user","device_address"]
 
       	# l'adresse du container Influxdb
-        host => "{{logstash_influxDB_ip}}"
+        host => "{{ logstash_influxDB_ip.stdout }}"
 
-      	# Le nom de la base influx créée dans laquelle on souhaite inserer nos données
+      	# Le nom de la base influx creee dans laquelle on souhaite inserer nos données
       	db => "logstash_data"
 
       	# Le nom du measurement de la base influxdb
       	measurement => "heart"
 
-      	# Automatique quand on utilise un formart de donnée JSON en input
+      	# Automatique quand on utilise un format de donnée JSON en input
 
       	codec => json
 
-      	# Option pour utiliser les "fields" comme donnée envoy� a influxdb
+      	# Option pour utiliser les "fields" comme donnée envoye a influxdb
       	use_event_fields_for_data_points => true
 
       	# Ne rentrer dans influxdb que les champs qui nous intéressent
