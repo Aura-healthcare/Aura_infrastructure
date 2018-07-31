@@ -6,3 +6,7 @@
     influxdb_container_name: "{{ aura_time_series_db_container }}"
     influxdb_docker_networks:
       - name: "{{ aura_docker_network }}"
+
+- name: Create database in influxdb
+  become: true
+  shell: "docker exec influxdb influx -execute 'CREATE DATABASE {{ influx_db_name }}'"
