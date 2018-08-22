@@ -4,5 +4,5 @@ dependencies:
     - role: base/docker
     - role: base/ansible_dependencies
       dependency_roles:
-        - src: "git+https://github.com/BastienF/ansible-traefik-in-docker"
+        - src: "git+https://github.com/Aura-healthcare/ansible-traefik-in-docker"
           version: master
