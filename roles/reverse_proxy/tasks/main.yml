@@ -18,3 +18,7 @@
         host: "explore.{{ domain }}"
         dest: "http://{{ aura_jupyter_container }}:8000"
         host_gen_cert: true
+      websocket_server:
+        host: "data.{{ domain }}"
+        dest: "ws://{{ aura_backend_webserver_container }}:8887"
+        host_gen_cert: true
