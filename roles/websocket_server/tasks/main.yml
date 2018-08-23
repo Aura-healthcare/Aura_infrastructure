@@ -1,7 +1,0 @@
----
-
-- include_role:
-    name: .galaxy/ansible-role-websocket-server-in-docker
-  vars:
-    websocket_server_docker_networks:
-      - name: "{{ aura_docker_network }}"

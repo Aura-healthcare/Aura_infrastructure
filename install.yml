@@ -16,7 +16,7 @@
       tags: time_series_db
     - role: jupyter
       tags: jupyter
-    - role: websocket_server
-      tags: websocket_server
+    - role: backend_webserver
+      tags: backend_webserver
     - role: reverse_proxy
       tags: reverse_proxy
