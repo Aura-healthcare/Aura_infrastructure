@@ -1,7 +1,7 @@
 input {
    file {
 	# chemin vers les fichiers sur le conteneur
-	path => ["{{logstash_data_container_location}}/*_RrInterval_*"]
+	path => ["{{ aura_logstash_data_container_location }}/*_RrInterval_*"]
 	type => "RrInterval"
 	codec => "json"
 	# Logstash commence par lire les fichiers qui sont au début

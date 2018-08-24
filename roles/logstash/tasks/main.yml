@@ -1,23 +1,15 @@
 ---
 
-- name: Create logstash local conf directory
+- name: load logstash conf file content
   become: true
-  file:
-    path: "{{ item }}"
-    state: directory
-    recurse: true
-  with_items:
-    - "{{ logstash_conf_location }}"
-
-- name: Create configuration file
-  become: true
-  template:
-    src: logstash.conf.j2
-    dest: "{{ logstash_conf_location }}/logstash.conf"
+  set_fact:
+    aura_logstash_conf_file_content: "{{ lookup('template', 'logstash.conf.j2') }}"
 
 - include_role:
     name: .galaxy/ansible-logstash-in-docker
   vars:
     logstash_container_name: "{{ aura_logstash_container }}"
+    logstash_conf_file_content: "{{ aura_logstash_conf_file_content }}"
+    logstash_data_container_location: "{{ aura_logstash_data_container_location }}"
     logstash_docker_networks:
       - name: "{{ aura_docker_network }}"
