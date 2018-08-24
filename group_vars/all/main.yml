@@ -6,6 +6,8 @@ aura_time_series_db_container: "influxdb"
 aura_jupyter_container: "jupyterhub"
 aura_logstash_container: "logstash"
 
+aura_physio_data_db_name: "physio_signals"
+
 jupyter_url: 'https://explore.{{ domain }}'
 
 jupyter_authorized_users:
