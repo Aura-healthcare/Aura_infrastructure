@@ -1,6 +1,6 @@
 input {
    file {
-	# chemin vers les fichiers sur notre Host
+	# chemin vers les fichiers sur le conteneur
 	path => ["{{logstash_data_container_location}}/*_RrInterval_*"]
 	type => "RrInterval"
 	codec => "json"
@@ -52,10 +52,10 @@ output {
       	send_as_tags => ["user","device_address"]
 
       	# l'adresse du container Influxdb
-        host => "{{ logstash_influxDB_ip.stdout }}"
+        host => "{{ aura_time_series_db_container }}"
 
       	# Le nom de la base influx creee dans laquelle on souhaite inserer nos données
-      	db => "logstash_data"
+      	db => "{{ aura_physio_data_db_name }}"
 
       	# Le nom du measurement de la base influxdb
       	measurement => "heart"

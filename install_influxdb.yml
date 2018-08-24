@@ -1,6 +1,0 @@
----
-
-- hosts: all
-  roles:
-    - role: time_series_db
-      tags: time_series_db

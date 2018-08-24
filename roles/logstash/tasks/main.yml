@@ -1,6 +1,6 @@
 ---
 
-- name: create logstash local directories
+- name: Create logstash local conf directory
   become: true
   file:
     path: "{{ item }}"
@@ -8,28 +8,12 @@
     recurse: true
   with_items:
     - "{{ logstash_conf_location }}"
-    - "{{ logstash_data_location }}"
 
-- name: Create IP_influx variable
-  shell: "docker inspect --format '{''{ .NetworkSettings.IPAddress }''}' {{ influxdb_container_name }}"
-  register: logstash_influxDB_ip
-  become: yes
-
-- name: "Create configuration"
+- name: Create configuration file
   become: true
   template:
     src: logstash.conf.j2
     dest: "{{ logstash_conf_location }}/logstash.conf"
-
-
-- name: Ansible copy directory with tests files to the remote server
-  copy:
-     src: "{{ role_path }}/files/data_example/"
-     dest: "{{ logstash_data_location }}"
-     owner: "root"
-     group: "root"
-  become: yes
-
 
 - include_role:
     name: .galaxy/ansible-logstash-in-docker

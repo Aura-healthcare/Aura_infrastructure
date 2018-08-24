@@ -9,4 +9,4 @@
 
 - name: Create database in influxdb
   become: true
-  shell: "docker exec influxdb influx -execute 'CREATE DATABASE {{ influx_db_name }}'"
+  shell: "docker exec {{ aura_time_series_db_container }} influx -execute 'CREATE DATABASE {{ aura_physio_data_db_name }}';"
