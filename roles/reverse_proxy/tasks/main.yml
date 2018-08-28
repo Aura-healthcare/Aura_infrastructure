@@ -12,7 +12,7 @@
     traefik_endpoints:
       influxdb:
         host: "db.{{ domain }}"
-        dest: "http://{{ aura_time_series_db_container }}:8086"
+        dest: "http://{{ aura_time_series_db_container }}:{{ aura_time_series_db_port }}"
         host_gen_cert: true
       jupyterhub:
         host: "explore.{{ domain }}"
@@ -21,4 +21,8 @@
       websocket_server:
         host: "data.{{ domain }}"
         dest: "ws://{{ aura_backend_webserver_container }}:8887"
+        host_gen_cert: true
+      grafana:
+        host: "monitor.{{ domain }}"
+        dest: "http://{{ aura_monitoring_platform_container }}:3000"
         host_gen_cert: true

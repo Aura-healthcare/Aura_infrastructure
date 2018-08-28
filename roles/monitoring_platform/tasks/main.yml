@@ -1,0 +1,11 @@
+---
+
+- include_role:
+    name: .galaxy/ansible-role-grafana-in-docker
+  vars:
+    grafana_docker_networks:
+      - name: "{{ aura_docker_network }}"
+    datasource_type: "{{ aura_time_series_db_type }}"
+    datasource_database: "{{ aura_physio_data_db_name }}"
+    datasource_hostname: "{{ aura_time_series_db_container }}"
+    datasource_port: "{{ aura_time_series_db_port }}"
