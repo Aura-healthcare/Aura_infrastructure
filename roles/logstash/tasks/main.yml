@@ -1,6 +1,6 @@
 ---
 
-- name: load logstash conf file content
+- name: Load logstash conf file content
   become: true
   set_fact:
     aura_logstash_conf_file_content: "{{ lookup('template', 'logstash.conf.j2') }}"
