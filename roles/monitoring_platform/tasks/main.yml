@@ -14,5 +14,6 @@
 - name: Copy dashbords folder
   become: true
   synchronize:
-    src: files/
+    src: files/dashboards/
     dest: "{{ grafana_dashboards_location_on_host }}"
+    delete: yes
