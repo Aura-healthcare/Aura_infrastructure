@@ -41,7 +41,6 @@ filter{
 }
 
 output {
-   stdout {}
    if [type] == "RrInterval" {
       influxdb {
 

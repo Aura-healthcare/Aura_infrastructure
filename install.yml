@@ -22,4 +22,6 @@
       tags: reverse_proxy
     - role: logstash
       tags: logstash
+    - role: monitoring_platform
+      tags: monitoring_platform
 
