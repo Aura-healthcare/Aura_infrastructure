@@ -9,34 +9,100 @@ input {
     ignore_older => 0
     #sincedb_path => "/home/logstash/data/since_db_filed"
    }
+
+   file {
+	path => ["{{logstash_data_container_location}}/*_MotionAccelerometer_*"]
+	type => "MotionAccelerometer"
+	codec => "json"
+	start_position => "beginning"
+    ignore_older => 0
+   }
+
+   file {
+	path => ["{{logstash_data_container_location}}/*_MotionGyroscope_*"]
+	type => "MotionGyroscope"
+	codec => "json"
+	start_position => "beginning"
+    ignore_older => 0
+   }
+
 }
 
 filter{
 
-	json {
-		source => "message"
-		# Option pour ignorer le parsing et l'envoi de donnee
-		# si le format json n'est pas respectee
-		#skip_on_invalid_json => true
-	}
+    if [type] == "RrInterval" {
+        json {
+            source => "message"
+            # Option pour ignorer le parsing et l'envoi de donnee
+            # si le format json n'est pas respectee
+            #skip_on_invalid_json => true
+        }
 
-	# Splitter le champ data ["time1 value1", "time2 value2", etc ...]
-	# pour rentrer chaque ligne avec la même vaeur user, device_address
-	split { field => "data"}
+        # Splitter le champ data ["time1 value1", "time2 value2", etc ...]
+        # pour rentrer chaque ligne avec la même vaeur user, device_address
+        split { field => "data"}
 
-	# Spliter le contenu du champ data en 2 valeurs : timestamp et value
-	mutate {
-		split => {"data" => " "}
-		add_field => {"time_bis" => "%{data[0]}"}
-		add_field => {"value" => "%{data[1]}"}
-	}
+        # Spliter le contenu du champ data en 2 valeurs : timestamp et value
+        mutate {
+            split => {"data" => " "}
+            add_field => {"time_bis" => "%{data[0]}"}
+            add_field => {"rri" => "%{data[1]}"}
+        }
 
-	# Decoder le timestamp et remplacer le @timestamp que Logstash genere par cette valeur
+        # Decoder le timestamp et remplacer le @timestamp que Logstash genere par cette valeur
+            date {
+                timezone => "UTC"
+                match => ["time_bis", "ISO8601"]
+                target => "@timestamp"
+            }
+        }
+
+    if [type] == "MotionAccelerometer" {
+        json {
+            source => "message"
+        }
+
+        split { field => "data"}
+
+        mutate {
+            split => {"data" => " "}
+            add_field => {"time_bis" => "%{data[0]}"}
+            add_field => {"x_axis_acm" => "%{data[1]}"}
+            add_field => {"y_axis_acl" => "%{data[2]}"}
+            add_field => {"z_axis_acm" => "%{data[3]}"}
+            add_field => {"sensibility_acm" => "%{data[4]}"}
+        }
+
         date {
-        	timezone => "UTC"
-        	match => ["time_bis", "ISO8601"]
-        	target => "@timestamp"
-	}
+            timezone => "UTC"
+            match => ["time_bis", "ISO8601"]
+            target => "@timestamp"
+        }
+
+    }
+
+    if [type] == "MotionGyroscope" {
+        json {
+            source => "message"
+        }
+
+        split { field => "data"}
+
+        mutate {
+            split => {"data" => " "}
+            add_field => {"time_bis" => "%{data[0]}"}
+            add_field => {"x_axis_gyro" => "%{data[1]}"}
+            add_field => {"y_axis_gyro" => "%{data[2]}"}
+            add_field => {"z_axis_gyro" => "%{data[3]}"}
+        }
+
+        date {
+            timezone => "UTC"
+            match => ["time_bis", "ISO8601"]
+            target => "@timestamp"
+        }
+
+    }
 
 }
 
@@ -69,6 +135,71 @@ output {
 
       	# Ne rentrer dans influxdb que les champs qui nous intéressent
       	exclude_fields => ["time_bis", "message", "data", "@timestamp","@version", "type", "path", "host"]
-        }
+      	}
     }
+
+    if [type] == "MotionAccelerometer" {
+
+      influxdb {
+
+        id => "MotionAccelerometer"
+
+      	# allow_time_override => true
+      	# Choisir les valeurs considérées comme des tags par Influxdb
+      	send_as_tags => ["user","device_address"]
+
+      	# l'adresse du container Influxdb
+        host => "{{ logstash_influxDB_ip.stdout }}"
+
+      	# Le nom de la base influx creee dans laquelle on souhaite inserer nos données
+      	db => "logstash_data"
+
+      	# Le nom du measurement de la base influxdb
+      	measurement => "accelerometer"
+
+      	# Automatique quand on utilise un format de donnée JSON en input
+
+      	codec => json
+
+      	# Option pour utiliser les "fields" comme donnée envoye a influxdb
+      	use_event_fields_for_data_points => true
+
+      	# Ne rentrer dans influxdb que les champs qui nous intéressent
+      	exclude_fields => ["time_bis", "message", "data", "@timestamp","@version", "type", "path", "host"]
+      	}
+
+    }
+
+    if [type] == "MotionGyroscope" {
+
+      influxdb {
+
+        id => "MotionGyroscope"
+
+      	# allow_time_override => true
+      	# Choisir les valeurs considérées comme des tags par Influxdb
+      	send_as_tags => ["user","device_address"]
+
+      	# l'adresse du container Influxdb
+        host => "{{ logstash_influxDB_ip.stdout }}"
+
+      	# Le nom de la base influx creee dans laquelle on souhaite inserer nos données
+      	db => "logstash_data"
+
+      	# Le nom du measurement de la base influxdb
+      	measurement => "gyroscope"
+
+      	# Automatique quand on utilise un format de donnée JSON en input
+
+      	codec => json
+
+      	# Option pour utiliser les "fields" comme donnée envoye a influxdb
+      	use_event_fields_for_data_points => true
+
+      	# Ne rentrer dans influxdb que les champs qui nous intéressent
+      	exclude_fields => ["time_bis", "message", "data", "@timestamp","@version", "type", "path", "host"]
+      	}
+
+    }
+
 }
