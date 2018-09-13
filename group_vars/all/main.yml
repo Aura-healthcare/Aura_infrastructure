@@ -5,6 +5,12 @@ aura_docker_network: "skynet"
 aura_time_series_db_container: "influxdb"
 aura_jupyter_container: "jupyterhub"
 aura_logstash_container: "logstash"
+aura_backend_webserver_container: "websocket-server"
+aura_monitoring_platform_container: "grafana"
+
+aura_time_series_db_port: 8086
+aura_physio_data_db_name: "physio_signals"
+aura_time_series_db_type: "influxdb"
 
 jupyter_url: 'https://explore.{{ domain }}'
 
@@ -18,3 +24,5 @@ jupyter_authorized_users:
   - sluslu
   - tbrien
   - Udyrfrykte
+
+grafana_dashboards_location_on_host: "/opt/docker-data/{{ aura_monitoring_platform_container }}/dashboards/"

@@ -4,6 +4,10 @@
 secrets.yml
 install.retry
 .vagrant/
+<<<<<<< HEAD
 install_influxdb.yml
 install_logstash.yml
 .DS_Store
+=======
+.DS_Store
+>>>>>>> 5e1020cd8b12b6d4ef5f41738af02249f5369cc0
