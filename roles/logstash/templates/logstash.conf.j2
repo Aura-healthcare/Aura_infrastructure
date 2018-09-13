@@ -107,7 +107,8 @@ filter{
 }
 
 output {
-   stdout {}
+   # A enlever en production, le printing de l'éecriture ralentit fortement
+   #stdout {}
    if [type] == "RrInterval" {
       influxdb {
 
