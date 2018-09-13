@@ -7,6 +7,19 @@
     influxdb_docker_networks:
       - name: "{{ aura_docker_network }}"
 
-- name: Create database in influxdb
+- name: Install influxdb python module
   become: true
-  shell: "docker exec influxdb influx -execute 'CREATE DATABASE {{ influx_db_name }}'"
+  pip:
+    name: "influxdb"
+    state: present
+
+- name: Get influxdb IP
+  become: true
+  changed_when: false
+  shell: docker inspect --format '{''{ .NetworkSettings.IPAddress }''}' {{ aura_time_series_db_container }}
+  register : influxdb_ip
+
+- name: Create database in influxdb
+  influxdb_database:
+    hostname: "{{ influxdb_ip.stdout }}"
+    database_name: "{{ aura_physio_data_db_name }}"

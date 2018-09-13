@@ -12,6 +12,8 @@ aura_time_series_db_port: 8086
 aura_physio_data_db_name: "physio_signals"
 aura_time_series_db_type: "influxdb"
 
+aura_physio_data_db_name: "physio_signals"
+
 jupyter_url: 'https://explore.{{ domain }}'
 
 jupyter_authorized_users:
