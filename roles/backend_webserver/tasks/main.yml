@@ -25,7 +25,8 @@
     name: "{{ websocket_server_container_name }}"
     image: elrib/aura_websocket_server
     recreate: true
-    networks: "{{ websocket_server_docker_networks }}"
+    networks:
+      - name: "{{ aura_docker_network }}"
     volumes:
       - "{{ websocket_server_data_location }}:/data/todo"
       - "{{ websocket_server_conf_location }}/wsserver.properties:/home/conf/wsserver.properties:ro"
