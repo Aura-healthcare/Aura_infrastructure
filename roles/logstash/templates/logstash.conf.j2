@@ -17,7 +17,7 @@ filter{
 		source => "message"
 		# Option pour ignorer le parsing et l'envoi de donnee
 		# si le format json n'est pas respectee
-		#skip_on_invalid_json => true
+		skip_on_invalid_json => true
 	}
 
 	# Splitter le champ data ["time1 value1", "time2 value2", etc ...]
