@@ -1,10 +1,13 @@
 input {
 
     file {
+        # mode => "read" # only version >= 6.4
         path => ["{{ aura_logstash_data_container_location }}/*_RrInterval_*"]
         type => "RrInterval"
         codec => "json"
-        start_position => "beginning"
+        start_position => "beginning" # no need with read mode
+        # file_completed_action => "log" # action to take after file is read
+        # file_completed_log_path => "/usr/share/logstash" # path to store file read by logstash
         ignore_older => 0
     }
 
