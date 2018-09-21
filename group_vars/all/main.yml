@@ -11,6 +11,7 @@ aura_monitoring_platform_container: "grafana"
 aura_time_series_db_port: 8086
 aura_physio_data_db_name: "physio_signals"
 aura_time_series_db_type: "influxdb"
+aura_internal_db_data_db_name: "_internal"
 
 jupyter_url: 'https://explore.{{ domain }}'
 
