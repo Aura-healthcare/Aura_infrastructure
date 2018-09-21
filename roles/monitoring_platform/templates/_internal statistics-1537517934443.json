@@ -59,7 +59,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "_internal influxdb",
+      "datasource": "{{ aura_time_series_db_type }} {{ aura_internal_db_data_db_name }}",
       "fill": 1,
       "gridPos": {
         "h": 9,
@@ -173,7 +173,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "_internal influxdb",
+      "datasource": "{{ aura_time_series_db_type }} {{ aura_internal_db_data_db_name }}",
       "description": "how InfluxDB is using the Go heap",
       "fill": 1,
       "gridPos": {
@@ -325,7 +325,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "_internal influxdb",
+      "datasource": "{{ aura_time_series_db_type }} {{ aura_internal_db_data_db_name }}",
       "description": "Amount of memory dedicated to particular size classes, but not currently being used.\nThis is an upper bound on fragmentation, but in general this memory can be reused efficiently.",
       "fill": 1,
       "gridPos": {
@@ -440,7 +440,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "_internal influxdb",
+      "datasource": "{{ aura_time_series_db_type }} {{ aura_internal_db_data_db_name }}",
       "fill": 1,
       "gridPos": {
         "h": 9,
@@ -554,7 +554,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "_internal influxdb",
+      "datasource": "{{ aura_time_series_db_type }} {{ aura_internal_db_data_db_name }}",
       "description": "Sys is the total bytes of memory obtained from the OS.\nFrees is the cumulative count of heap objects freed.",
       "fill": 1,
       "gridPos": {
@@ -710,7 +710,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "_internal influxdb",
+      "datasource": "{{ aura_time_series_db_type }} {{ aura_internal_db_data_db_name }}",
       "format": "none",
       "gauge": {
         "maxValue": 100,
