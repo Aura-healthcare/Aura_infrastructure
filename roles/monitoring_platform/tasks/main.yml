@@ -28,3 +28,7 @@
 - name : Copy templated Dashboard file
   become: true
   template: src="templates/_internal_statistics-1537517934443.json" dest="{{ grafana_dashboards_location_on_host }}" mode=0644
+
+- name : Copy templated RrInterval Dashboard file
+  become: true
+  template: src="templates/Rr_Interval_dashboard.json" dest="{{ grafana_dashboards_location_on_host }}" mode=0644
