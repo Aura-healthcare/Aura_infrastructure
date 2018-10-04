@@ -18,12 +18,12 @@
         datasource_hostname: "{{ aura_time_series_db_container }}"
         datasource_port: "{{ aura_time_series_db_port }}"
 
-- name: Copy dashboards folder
-  become: true
-  synchronize:
-    src: files/dashboards/
-    dest: "{{ grafana_dashboards_location_on_host }}"
-    delete: yes
+#- name: Copy dashboards folder
+#  become: true
+#  synchronize:
+#    src: files/dashboards/
+#    dest: "{{ grafana_dashboards_location_on_host }}"
+#   delete: yes
 
 - name : Copy templated Dashboard file
   become: true
@@ -32,3 +32,11 @@
 - name : Copy templated RrInterval Dashboard file
   become: true
   template: src="templates/Rr_Interval_dashboard.json" dest="{{ grafana_dashboards_location_on_host }}" mode=0644
+
+- name : Copy templated Accelerometer dashboard file
+  become: true
+  template: src="templates/Accelerometer_dashboard.json" dest="{{ grafana_dashboards_location_on_host }}" mode=0644
+
+- name : Copy templated Motion Gyroscope dashboard file
+  become: true
+  template: src="templates/Motion_Gyroscope_dashboard.json" dest="{{ grafana_dashboards_location_on_host }}" mode=0644

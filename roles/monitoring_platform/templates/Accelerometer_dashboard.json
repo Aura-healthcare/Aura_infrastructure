@@ -15,7 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1538651182944,
+  "iteration": 1538650627096,
   "links": [],
   "panels": [
     {
@@ -26,9 +26,9 @@
         "x": 0,
         "y": 0
       },
-      "id": 12,
+      "id": 8,
       "panels": [],
-      "title": "Raw Rr Interval",
+      "title": "Raw Accelerometer data",
       "type": "row"
     },
     {
@@ -39,10 +39,124 @@
       "datasource": "{{ aura_time_series_db_type }} {{ aura_physio_data_db_name }}",
       "fill": 1,
       "gridPos": {
-        "h": 18,
+        "h": 7,
         "w": 24,
         "x": 0,
         "y": 1
+      },
+      "id": 2,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT \"x_acm\" FROM \"MotionAccelerometer\" WHERE (\"user\" =~ /^$user$/)  AND time >= '2018-07-03 10:00:00' AND time < '2018-07-03 20:00:00'  GROUP BY \"user\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "X-axis accelerometer",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "{{ aura_time_series_db_type }} {{ aura_physio_data_db_name }}",
+      "fill": 1,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 8
       },
       "id": 4,
       "legend": {
@@ -71,28 +185,20 @@
           "groupBy": [
             {
               "params": [
-                "1m"
+                "$__interval"
               ],
               "type": "time"
             },
             {
               "params": [
-                "user"
-              ],
-              "type": "tag"
-            },
-            {
-              "params": [
-                "none"
+                "null"
               ],
               "type": "fill"
             }
           ],
-          "hide": false,
-          "measurement": "RrInterval",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT \"RrInterval\" FROM \"RrInterval\" WHERE (\"user\" =~ /^$user$/) AND time >= '2018-07-10 09:00:00' AND time < '2018-07-10 19:30:00' GROUP BY \"user\"",
+          "query": "SELECT \"y_acm\" FROM \"MotionAccelerometer\" WHERE (\"user\" =~ /^$user$/) AND time >= '2018-07-03 10:00:00' AND time < '2018-07-03 20:00:00' GROUP BY \"user\"",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -100,25 +206,23 @@
             [
               {
                 "params": [
-                  "RrInterval"
+                  "value"
                 ],
                 "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
               }
             ]
           ],
-          "tags": [
-            {
-              "key": "user",
-              "operator": "=~",
-              "value": "/^$user$/"
-            }
-          ]
+          "tags": []
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Rr Interval",
+      "title": "Y-axis accelerometer",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -137,7 +241,7 @@
           "format": "short",
           "label": null,
           "logBase": 1,
-          "max": "2500",
+          "max": null,
           "min": null,
           "show": true
         },
@@ -145,7 +249,121 @@
           "format": "short",
           "label": null,
           "logBase": 1,
-          "max": "2500",
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "{{ aura_time_series_db_type }} {{ aura_physio_data_db_name }}",
+      "fill": 1,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
+      "id": 6,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT \"z_acm\" FROM \"MotionAccelerometer\" WHERE (\"user\" =~ /^$user$/) AND time >= '2018-07-03 10:00:00' AND time < '2018-07-03 20:00:00' GROUP BY \"user\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Z-axis accelerometer",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
           "min": null,
           "show": true
         }
@@ -161,24 +379,24 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 19
+        "y": 22
       },
       "id": 10,
       "panels": [
         {
           "aliasColors": {},
-          "bars": false,
+          "bars": true,
           "dashLength": 10,
           "dashes": false,
           "datasource": "{{ aura_time_series_db_type }} {{ aura_physio_data_db_name }}",
           "fill": 1,
           "gridPos": {
-            "h": 8,
-            "w": 12,
+            "h": 9,
+            "w": 8,
             "x": 0,
-            "y": 20
+            "y": 2
           },
-          "id": 8,
+          "id": 12,
           "legend": {
             "avg": false,
             "current": false,
@@ -188,7 +406,7 @@
             "total": false,
             "values": false
           },
-          "lines": true,
+          "lines": false,
           "linewidth": 1,
           "links": [],
           "nullPointMode": "null",
@@ -205,7 +423,7 @@
               "groupBy": [
                 {
                   "params": [
-                    "1d"
+                    "1m"
                   ],
                   "type": "time"
                 },
@@ -222,16 +440,18 @@
                   "type": "fill"
                 }
               ],
-              "measurement": "RrInterval",
+              "measurement": "MotionAccelerometer",
               "orderByTime": "ASC",
               "policy": "default",
+              "query": "SELECT count(\"x_acm\") FROM \"MotionAccelerometer\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time(1m), \"user\" fill(none)",
+              "rawQuery": true,
               "refId": "A",
               "resultFormat": "time_series",
               "select": [
                 [
                   {
                     "params": [
-                      "RrInterval"
+                      "x_acm"
                     ],
                     "type": "field"
                   },
@@ -253,7 +473,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Rr Intervals count by day for each user",
+          "title": "X-axis values count per minute",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -298,18 +518,15 @@
           "datasource": "{{ aura_time_series_db_type }} {{ aura_physio_data_db_name }}",
           "fill": 1,
           "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 20
+            "h": 9,
+            "w": 8,
+            "x": 8,
+            "y": 2
           },
-          "id": 2,
+          "id": 14,
           "legend": {
-            "alignAsTable": false,
             "avg": false,
             "current": false,
-            "hideEmpty": false,
-            "hideZero": false,
             "max": false,
             "min": false,
             "show": true,
@@ -333,28 +550,20 @@
               "groupBy": [
                 {
                   "params": [
-                    "1m"
+                    "$__interval"
                   ],
                   "type": "time"
                 },
                 {
                   "params": [
-                    "user"
-                  ],
-                  "type": "tag"
-                },
-                {
-                  "params": [
-                    "none"
+                    "null"
                   ],
                   "type": "fill"
                 }
               ],
-              "hide": false,
-              "measurement": "RrInterval",
               "orderByTime": "ASC",
-              "policy": "autogen",
-              "query": "SELECT count(\"RrInterval\") FROM \"autogen\".\"RrInterval\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time(1m), \"user\" fill(none)",
+              "policy": "default",
+              "query": "SELECT count(\"y_acm\") FROM \"MotionAccelerometer\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time(1m), \"user\" fill(none)",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "time_series",
@@ -362,29 +571,23 @@
                 [
                   {
                     "params": [
-                      "RrInterval"
+                      "value"
                     ],
                     "type": "field"
                   },
                   {
                     "params": [],
-                    "type": "count"
+                    "type": "mean"
                   }
                 ]
               ],
-              "tags": [
-                {
-                  "key": "user",
-                  "operator": "=~",
-                  "value": "/^$user$/"
-                }
-              ]
+              "tags": []
             }
           ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "RrInterval count per minute",
+          "title": "Y-axis values count per minute",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -422,60 +625,59 @@
           }
         },
         {
-          "columns": [],
+          "aliasColors": {},
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "{{ aura_time_series_db_type }} {{ aura_physio_data_db_name }}",
-          "fontSize": "100%",
+          "fill": 1,
           "gridPos": {
-            "h": 3,
-            "w": 24,
-            "x": 0,
-            "y": 28
+            "h": 9,
+            "w": 8,
+            "x": 16,
+            "y": 2
           },
-          "id": 6,
+          "id": 16,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": false,
+          "linewidth": 1,
           "links": [],
-          "pageSize": null,
-          "scroll": true,
-          "showHeader": true,
-          "sort": {
-            "col": 0,
-            "desc": true
-          },
-          "styles": [
-            {
-              "alias": "Time",
-              "dateFormat": "YYYY-MM-DD HH:mm:ss",
-              "pattern": "Time",
-              "type": "date"
-            },
-            {
-              "alias": "",
-              "colorMode": null,
-              "colors": [
-                "rgba(245, 54, 54, 0.9)",
-                "rgba(237, 129, 40, 0.89)",
-                "rgba(50, 172, 45, 0.97)"
-              ],
-              "decimals": 2,
-              "pattern": "/.*/",
-              "thresholds": [],
-              "type": "number",
-              "unit": "short"
-            }
-          ],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
           "targets": [
             {
               "groupBy": [
                 {
                   "params": [
-                    "user"
+                    "$__interval"
                   ],
-                  "type": "tag"
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
                 }
               ],
-              "measurement": "RrInterval",
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"RrInterval\") FROM \"RrInterval\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY \"user\"",
+              "query": "SELECT count(\"y_acm\") FROM \"MotionAccelerometer\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time(1m), \"user\" fill(none)",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "time_series",
@@ -483,31 +685,61 @@
                 [
                   {
                     "params": [
-                      "RrInterval"
+                      "value"
                     ],
                     "type": "field"
                   },
                   {
                     "params": [],
-                    "type": "count"
+                    "type": "mean"
                   }
                 ]
               ],
-              "tags": [
-                {
-                  "key": "user",
-                  "operator": "=~",
-                  "value": "/^$user$/"
-                }
-              ]
+              "tags": []
             }
           ],
-          "title": "RR-intervals data count by user",
-          "transform": "timeseries_to_columns",
-          "type": "table"
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Z-axis values count per minute",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
         }
       ],
-      "title": "Aggregated informations",
+      "title": "Accelerometer data count per minute",
       "type": "row"
     }
   ],
@@ -520,12 +752,9 @@
       {
         "allValue": null,
         "current": {
-          "text": "2b3d7a98-a1fb-47ad-9705-4a91d448da9b + 7364575b-65df-4a7b-962a-b39ec2b33c79 + 8284fa83-ea69-40e8-b1d3-1d19ee0708fa + ef613034-3cab-4e90-a6f5-f98d36a8a9e1",
+          "text": "2b3d7a98-a1fb-47ad-9705-4a91d448da9b",
           "value": [
-            "2b3d7a98-a1fb-47ad-9705-4a91d448da9b",
-            "7364575b-65df-4a7b-962a-b39ec2b33c79",
-            "8284fa83-ea69-40e8-b1d3-1d19ee0708fa",
-            "ef613034-3cab-4e90-a6f5-f98d36a8a9e1"
+            "2b3d7a98-a1fb-47ad-9705-4a91d448da9b"
           ]
         },
         "datasource": "{{ aura_time_series_db_type }} {{ aura_physio_data_db_name }}",
@@ -535,7 +764,7 @@
         "multi": true,
         "name": "user",
         "options": [],
-        "query": "SHOW TAG VALUES FROM RrInterval WITH KEY = \"user\"",
+        "query": "SHOW TAG VALUES FROM MotionAccelerometer WITH KEY = \"user\"",
         "refresh": 2,
         "regex": "",
         "sort": 0,
@@ -548,8 +777,8 @@
     ]
   },
   "time": {
-    "from": "2018-07-10T07:59:33.289Z",
-    "to": "2018-07-10T17:50:16.647Z"
+    "from": "2018-07-03T13:36:01.618Z",
+    "to": "2018-07-03T17:30:39.536Z"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -577,7 +806,7 @@
     ]
   },
   "timezone": "",
-  "title": "Rr Interval dashboard",
-  "uid": "V_ZpEfAik",
-  "version": 173
+  "title": "Accelerometer dashboard",
+  "uid": "NOLbreAiz",
+  "version": 1
 }
