@@ -29,14 +29,10 @@
   become: true
   template: src="templates/_internal_statistics-1537517934443.json" dest="{{ grafana_dashboards_location_on_host }}" mode=0644
 
-- name : Copy templated RrInterval Dashboard file
+- name : Copy templated Home Dashboard file
   become: true
-  template: src="templates/Rr_Interval_dashboard.json" dest="{{ grafana_dashboards_location_on_host }}" mode=0644
+  template: src="templates/home_dashboard.json" dest="{{ grafana_dashboards_location_on_host }}" mode=0644
 
-- name : Copy templated Accelerometer dashboard file
+- name : Copy templated user zoom dashboard file
   become: true
-  template: src="templates/Accelerometer_dashboard.json" dest="{{ grafana_dashboards_location_on_host }}" mode=0644
-
-- name : Copy templated Motion Gyroscope dashboard file
-  become: true
-  template: src="templates/Motion_Gyroscope_dashboard.json" dest="{{ grafana_dashboards_location_on_host }}" mode=0644
+  template: src="templates/user_zoom_dashboard.json" dest="{{ grafana_dashboards_location_on_host }}" mode=0644
