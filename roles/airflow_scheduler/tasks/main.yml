@@ -18,7 +18,13 @@
     dest: "{{ airflow_requirements_location_test }}"
     delete: yes
 
-# TODO : restart container to pip install the custom requirements
+- name: Restart container to install the custom requirements
+  become: true
+  docker_container:
+    name: "{{ airflow_container_name }}"
+    image: rchampseix/airflow_aura
+    state: started
+    restart: yes
 
 - name : Copy templated python script
   become: true
