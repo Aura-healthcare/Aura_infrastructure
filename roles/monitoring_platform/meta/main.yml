@@ -6,4 +6,3 @@ dependencies:
       dependency_roles:
         - src: "git+https://github.com/Aura-healthcare/ansible-role-grafana-in-docker"
           version: master
-

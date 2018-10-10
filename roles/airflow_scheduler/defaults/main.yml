@@ -1,2 +1,15 @@
 ---
 # defaults file for roles/airflow_scheduler
+airflow_container_name: "airflow"
+
+airflow_root_location: "/opt/docker-data/{{ airflow_container_name }}"
+airflow_script_location_test: "{{ airflow_root_location }}/script"
+airflow_data_input_location_test: "/opt/docker-data/{{ aura_backend_webserver_container }}/data/todo"
+airflow_data_output_success_location_test: "{{ airflow_root_location }}/data/success"
+airflow_data_output_failed_location_test: "{{ airflow_root_location }}/data/failed"
+
+airflow_docker_networks: []
+#airflow_docker_networks:
+#  - name: "docker_network"
+
+airflow_container_restart_policy: "always"

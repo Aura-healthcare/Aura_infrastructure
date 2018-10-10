@@ -1,2 +1,24 @@
 ---
+
+- include_role:
+    name: .galaxy/ansible-airflow-in-docker
+  vars:
+    airflow_container_name: "airflow"
+    airflow_script_location: "{{ airflow_script_location_test }}"
+    airflow_data_input_location: "{{ airflow_data_input_location_test }}"
+    airflow_data_output_success_location: "{{ airflow_data_output_success_location_test }}"
+    airflow_data_output_failed_location: "{{ airflow_data_output_failed_location_test }}"
+    airflow_docker_networks:
+      - name: "{{ aura_docker_network }}"
+
+
+
 # tasks file for roles/airflow_scheduler
+
+- name : Copy templated python script
+  become: true
+  template: src="templates/raw_data_injector.py.j2" dest="{{ airflow_script_location_test }}/raw_data_injector.py" mode=0644
+
+# airflow test raw_data_injector write_data 2018-01-01
+
+
