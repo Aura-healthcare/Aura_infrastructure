@@ -18,13 +18,6 @@
         datasource_hostname: "{{ aura_time_series_db_container }}"
         datasource_port: "{{ aura_time_series_db_port }}"
 
-#- name: Copy dashboards folder
-#  become: true
-#  synchronize:
-#    src: files/dashboards/
-#    dest: "{{ grafana_dashboards_location_on_host }}"
-#   delete: yes
-
 - name : Copy templated Dashboard file
   become: true
   template: src="templates/_internal_statistics-1537517934443.json" dest="{{ grafana_dashboards_location_on_host }}" mode=0644

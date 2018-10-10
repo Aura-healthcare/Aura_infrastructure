@@ -15,7 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1539012386452,
+  "iteration": 1539085884182,
   "links": [],
   "panels": [
     {
@@ -277,7 +277,7 @@
           "yaxes": [
             {
               "format": "short",
-              "label": null,
+              "label": "Count / min",
               "logBase": 1,
               "max": null,
               "min": null,
@@ -720,7 +720,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"x_acm\") FROM \"MotionAccelerometer\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time(10m)",
+              "query": "SELECT count(\"x_acm\") FROM \"MotionAccelerometer\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time(1m)",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "time_series",
@@ -744,7 +744,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "X-acm data count per 10 min",
+          "title": "X-acm data count per minute",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -761,7 +761,7 @@
           "yaxes": [
             {
               "format": "short",
-              "label": null,
+              "label": "Count / min",
               "logBase": 1,
               "max": null,
               "min": null,
@@ -834,7 +834,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"y_acm\") FROM \"MotionAccelerometer\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time(10m)",
+              "query": "SELECT count(\"y_acm\") FROM \"MotionAccelerometer\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time(1m)",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "time_series",
@@ -858,7 +858,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Y-acm data count per 10 min",
+          "title": "Y-acm data count per minute",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -875,7 +875,7 @@
           "yaxes": [
             {
               "format": "short",
-              "label": null,
+              "label": "Count / min",
               "logBase": 1,
               "max": null,
               "min": null,
@@ -948,7 +948,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"z_acm\") FROM \"MotionAccelerometer\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time(10m)",
+              "query": "SELECT count(\"z_acm\") FROM \"MotionAccelerometer\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time(1m)",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "time_series",
@@ -972,7 +972,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Z-acm data count per 10 min",
+          "title": "Z-acm data count per minute",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -989,7 +989,7 @@
           "yaxes": [
             {
               "format": "short",
-              "label": null,
+              "label": "Count / min",
               "logBase": 1,
               "max": null,
               "min": null,
@@ -1432,7 +1432,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"x_gyro\") FROM \"MotionGyroscope\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time(10m)",
+              "query": "SELECT count(\"x_gyro\") FROM \"MotionGyroscope\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time(1m)",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "time_series",
@@ -1456,7 +1456,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "X-gyroscope data count per 10 min",
+          "title": "X-gyroscope data count per minute",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -1546,7 +1546,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"y_gyro\") FROM \"MotionGyroscope\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time(10m)",
+              "query": "SELECT count(\"y_gyro\") FROM \"MotionGyroscope\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time(1m)",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "time_series",
@@ -1570,7 +1570,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Y-gyroscope data count per 10 min",
+          "title": "Y-gyroscope data count per minute",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -1660,7 +1660,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"z_gyro\") FROM \"MotionGyroscope\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time(10m)",
+              "query": "SELECT count(\"z_gyro\") FROM \"MotionGyroscope\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time(1m)",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "time_series",
@@ -1684,7 +1684,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Z-gyroscope data count per 10 min",
+          "title": "Z-gyroscope data count per minute",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -1735,8 +1735,8 @@
       {
         "allValue": null,
         "current": {
-          "text": "2b3d7a98-a1fb-47ad-9705-4a91d448da9b",
-          "value": "2b3d7a98-a1fb-47ad-9705-4a91d448da9b"
+          "text": "ca48175a-bf0b-43bd-9e74-7cf92e2f35b1",
+          "value": "ca48175a-bf0b-43bd-9e74-7cf92e2f35b1"
         },
         "datasource": "{{ aura_time_series_db_type }} {{ aura_physio_data_db_name }}",
         "hide": 1,
@@ -1758,8 +1758,8 @@
     ]
   },
   "time": {
-    "from": "2018-07-03T08:31:02.019Z",
-    "to": "2018-07-04T02:02:47.243Z"
+    "from": "2018-07-02T12:29:22.845Z",
+    "to": "2018-07-02T16:48:41.268Z"
   },
   "timepicker": {
     "refresh_intervals": [
