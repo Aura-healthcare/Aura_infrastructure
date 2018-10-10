@@ -1758,8 +1758,8 @@
     ]
   },
   "time": {
-    "from": "2018-07-02T12:29:22.845Z",
-    "to": "2018-07-02T16:48:41.268Z"
+    "from": "now-4M",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [
