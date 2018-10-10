@@ -20,8 +20,10 @@
       tags: backend_webserver
     - role: reverse_proxy
       tags: reverse_proxy
-    - role: logstash
-      tags: logstash
+#    - role: logstash
+#      tags: logstash
     - role: monitoring_platform
       tags: monitoring_platform
+    - role: airflow_scheduler
+      tags: airflow_scheduler
 

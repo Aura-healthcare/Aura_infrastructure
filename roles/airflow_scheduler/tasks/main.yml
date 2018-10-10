@@ -11,14 +11,17 @@
     airflow_docker_networks:
       - name: "{{ aura_docker_network }}"
 
+- name: Copy requirements file
+  become: true
+  synchronize:
+    src: files/
+    dest: "{{ airflow_requirements_location_test }}"
+    delete: yes
 
-
-# tasks file for roles/airflow_scheduler
+# TODO : restart container to pip install the custom requirements
 
 - name : Copy templated python script
   become: true
-  template: src="templates/raw_data_injector.py.j2" dest="{{ airflow_script_location_test }}/raw_data_injector.py" mode=0644
+  template: src="templates/{{ airflow_python_script_name }}" dest="{{ airflow_script_location_test }}/{{ airflow_python_script_name }}" mode=0644
 
-# airflow test raw_data_injector write_data 2018-01-01
-
-
+# TODO : launch test command "airflow test raw_data_injector write_data 2018-01-01"

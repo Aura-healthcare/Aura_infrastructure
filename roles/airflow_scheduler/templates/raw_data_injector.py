@@ -350,7 +350,7 @@ PATH_FOR_PROBLEMS_FILES = "{{ airflow_data_output_failed_location_test }}"
 # Creation of client & Influx Database
 DB_NAME = "physio_signals"
 CLIENT = create_influxdb_client(host="influxdb", port=8086, user="root", password="root", db_name=DB_NAME)
-create_database(CLIENT, db_name=DB_NAME)
+#create_database(CLIENT, db_name=DB_NAME)
 DF_CLIENT = create_influxdb_df_client(host="influxdb", port=8086, user="root", password="root", db_name=DB_NAME)
 
 default_args = {
