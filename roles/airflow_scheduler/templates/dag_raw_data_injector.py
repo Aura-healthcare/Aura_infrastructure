@@ -10,9 +10,9 @@ from influxdb import DataFrameClient
 from influxdb_raw_data_injector import execute_write_pipeline
 
 # Multiple path for files processing
-PATH_TO_READ_DIRECTORY = "{{ airflow_data_input_location_test }}"
-PATH_FOR_WRITTEN_FILES = "{{ airflow_data_output_success_location_test }}"
-PATH_FOR_PROBLEMS_FILES = "{{ airflow_data_output_failed_location_test }}"
+PATH_TO_READ_DIRECTORY = "{{ airflow_data_input_location_in_container }}"
+PATH_FOR_WRITTEN_FILES = "{{ airflow_data_output_success_location_in_container }}"
+PATH_FOR_PROBLEMS_FILES = "{{ airflow_data_output_failed_location_in_container }}"
 
 # Useful Influx client constants
 DB_NAME = "physio_signals"
