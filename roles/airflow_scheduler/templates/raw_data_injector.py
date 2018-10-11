@@ -343,9 +343,9 @@ def execute_write_pipeline(path_to_read_directory, path_for_written_files, path_
 
 
 # Multiple path for files processing
-PATH_TO_READ_DIRECTORY = "{{ airflow_data_input_location_test }}"
-PATH_FOR_WRITTEN_FILES = "{{ airflow_data_output_success_location_test }}"
-PATH_FOR_PROBLEMS_FILES = "{{ airflow_data_output_failed_location_test }}"
+PATH_TO_READ_DIRECTORY = "{{ airflow_data_input_location_in_container }}"
+PATH_FOR_WRITTEN_FILES = "{{ airflow_data_output_success_location_in_container }}"
+PATH_FOR_PROBLEMS_FILES = "{{ airflow_data_output_failed_location_in_container }}"
 
 # Creation of client & Influx Database
 DB_NAME = "physio_signals"
