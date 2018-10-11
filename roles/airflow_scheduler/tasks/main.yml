@@ -26,8 +26,14 @@
     state: started
     restart: yes
 
-- name : Copy templated python script
+- name : Copy templated raw_data_injector DAG script
   become: true
   template: src="templates/{{ airflow_python_script_name }}" dest="{{ airflow_script_location_test }}/{{ airflow_python_script_name }}" mode=0644
 
-# TODO : launch test command "airflow test raw_data_injector write_data 2018-01-01"
+- name : Copy python file with methods to launch DAG raw_data_injector
+  become: true
+  template: src="templates/{{ airflow_python_injector_methods_script_name }}" dest="{{ airflow_script_location_test }}/{{ airflow_python_injector_methods_script_name }}" mode=0644
+
+# TODO : launch test command "airflow scheduler -D dag_id"
+# TODO : launch test command "airflow trigger_dag dag_id"
+# TODO : launch test command "airflow unpause dag_id"
