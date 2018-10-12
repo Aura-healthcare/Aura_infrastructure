@@ -141,8 +141,9 @@ def write_file_to_influxdb(file, path_to_data_test_directory, df_client):
         with open(path_to_data_test_directory + file) as json_file:
             json_data = json.load(json_file)
     except:
-        print("Impossible to open file.")
+        print("Impossible to open file : {}".format(file))
         write_success = False
+        return write_success
 
     # Get tags from file
     measurement = json_data[TYPE_PARAM_NAME]
@@ -257,8 +258,8 @@ def execute_write_pipeline(path_to_read_directory, path_for_written_files, path_
     start_time = time.time()
     for json_file in list_files_generator:
         is_writen = write_file_to_influxdb(json_file, path_to_read_directory, df_client)
-        move_file_processed(json_file, is_writen, path_to_read_directory, path_for_written_files,
-                            path_for_problems_files)
+        #move_file_processed(json_file, is_writen, path_to_read_directory, path_for_written_files,
+        #                    path_for_problems_files)
 
         if print_logs:
             # print logs
@@ -282,9 +283,9 @@ if __name__ == "__main__":
     PATH_FOR_PROBLEMS_FILES = "{{ airflow_data_output_failed_location_in_container }}"
 
     # Useful Influx client constants
-    DB_NAME = "physio_signals"
-    HOST = "localhost"
-    PORT = 8086
+    DB_NAME = "{{ aura_physio_data_db_name }}"
+    HOST = "{{ aura_time_series_db_container }}"
+    PORT = {{ aura_time_series_db_port }}
     USER = "root"
     PASSWORD = "root"
 

@@ -14,10 +14,10 @@ airflow_python_injector_methods_script_name: "influxdb_raw_data_injector.py"
 
 # variables inside container
 airflow_script_location_in_container: "/usr/local/airflow/dags/"
-airflow_data_input_location_in_container: "/home/data_test"
-airflow_data_output_success_location_in_container: "/home/write_complete"
-airflow_data_output_failed_location_in_container: "/home/problem_files"
-airflow_requirements_location_in_container: "/usr/local/airflow/requirements"
+airflow_data_input_location_in_container: "/home/data_test/"
+airflow_data_output_success_location_in_container: "/home/write_complete/"
+airflow_data_output_failed_location_in_container: "/home/problem_files/"
+airflow_requirements_location_in_container: "/usr/local/airflow/requirements/"
 
 airflow_docker_networks: []
 #airflow_docker_networks:
