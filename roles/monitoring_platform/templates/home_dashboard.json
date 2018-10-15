@@ -1,4 +1,46 @@
 {
+  "__inputs": [
+    {
+      "name": "DS_INFLUXDB_PHYSIO_SIGNALS",
+      "label": "influxdb physio_signals",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "influxdb",
+      "pluginName": "InfluxDB"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "5.2.2"
+    },
+    {
+      "type": "panel",
+      "id": "graph",
+      "name": "Graph",
+      "version": "5.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "influxdb",
+      "name": "InfluxDB",
+      "version": "5.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "singlestat",
+      "name": "Singlestat",
+      "version": "5.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": "5.0.0"
+    }
+  ],
   "annotations": {
     "list": [
       {
@@ -15,6 +57,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
+  "id": null,
   "links": [],
   "panels": [
     {
@@ -218,7 +261,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"RrInterval\") AS \"Total Rr Interval count\" FROM \"RrInterval\" GROUP BY \"user\"",
+              "query": "SELECT SUM(\"count\") AS \"Total Rr Interval count\" FROM \"rri_count_by_day\" GROUP BY \"user\"",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "table",
@@ -271,12 +314,12 @@
                 "rgba(237, 129, 40, 0.89)",
                 "rgba(50, 172, 45, 0.97)"
               ],
-              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "dateFormat": "MMMM D, YYYY LT",
               "decimals": 2,
               "mappingType": 1,
               "pattern": "Time",
               "thresholds": [],
-              "type": "hidden",
+              "type": "date",
               "unit": "short"
             },
             {
@@ -318,7 +361,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"RrInterval\") AS \"Rr Interval count\" FROM \"RrInterval\" WHERE $timeFilter GROUP BY \"user\"",
+              "query": "SELECT SUM(\"count\") AS \"Rr Interval count\" FROM \"rri_count_by_day\" WHERE $timeFilter GROUP BY \"user\"",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "table",
@@ -670,7 +713,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"x_acm\") AS \"Total X-acm count\" FROM \"MotionAccelerometer\" GROUP BY \"user\"",
+              "query": "SELECT SUM(\"count\") AS \"Total X-acm count\" FROM \"x_acm_count_by_day\" GROUP BY \"user\"",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "table",
@@ -707,7 +750,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"y_acm\") AS \"Total Y-acm count\" FROM \"MotionAccelerometer\" GROUP BY \"user\"",
+              "query": "SELECT SUM(\"count\") AS \"Total Y-acm count\" FROM \"y_acm_count_by_day\" GROUP BY \"user\"",
               "rawQuery": true,
               "refId": "B",
               "resultFormat": "table",
@@ -744,7 +787,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"z_acm\") AS \"Total Z-acm count\" FROM \"MotionAccelerometer\" GROUP BY \"user\"",
+              "query": "SELECT SUM(\"count\") AS \"Total Z-acm count\" FROM \"z_acm_count_by_day\" GROUP BY \"user\"",
               "rawQuery": true,
               "refId": "C",
               "resultFormat": "table",
@@ -779,21 +822,22 @@
             "x": 12,
             "y": 6
           },
+          "hideTimeOverride": false,
           "id": 16,
           "links": [],
           "pageSize": null,
           "scroll": true,
           "showHeader": true,
           "sort": {
-            "col": 2,
+            "col": 1,
             "desc": true
           },
           "styles": [
             {
               "alias": "Time",
-              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "dateFormat": "MMMM D, YYYY LT",
               "pattern": "Time",
-              "type": "hidden"
+              "type": "date"
             },
             {
               "alias": "",
@@ -848,7 +892,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"x_acm\") AS \"X-acm count\" FROM \"MotionAccelerometer\" WHERE $timeFilter GROUP BY \"user\"",
+              "query": "SELECT SUM(\"count\") AS \"X-acm count\" FROM \"x_acm_count_by_day\" WHERE $timeFilter GROUP BY \"user\"",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "table",
@@ -885,7 +929,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"y_acm\") AS \"Y-acm count\" FROM \"MotionAccelerometer\" WHERE $timeFilter GROUP BY \"user\"",
+              "query": "SELECT SUM(\"count\") AS \"Y-acm count\" FROM \"y_acm_count_by_day\" WHERE $timeFilter GROUP BY \"user\"",
               "rawQuery": true,
               "refId": "B",
               "resultFormat": "table",
@@ -922,7 +966,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"z_acm\") AS \"Z-acm count\" FROM \"MotionAccelerometer\" WHERE $timeFilter GROUP BY \"user\"",
+              "query": "SELECT SUM(\"count\") AS \"Z-acm count\" FROM \"z_acm_count_by_day\" WHERE $timeFilter GROUP BY \"user\"",
               "rawQuery": true,
               "refId": "C",
               "resultFormat": "table",
@@ -943,6 +987,7 @@
               "tags": []
             }
           ],
+          "timeShift": "1m",
           "title": "Accelerometer data count by user by time filter",
           "transform": "table",
           "type": "table"
@@ -1418,7 +1463,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"x_gyro\") AS \"Total X-gyro count\" FROM \"MotionGyroscope\" GROUP BY \"user\"",
+              "query": "SELECT SUM(\"count\") AS \"Total X-gyro count\" FROM \"x_gyro_count_by_day\" GROUP BY \"user\"",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "table",
@@ -1455,7 +1500,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"y_gyro\") AS \"Total Y-gyro count\" FROM \"MotionGyroscope\" GROUP BY \"user\"",
+              "query": "SELECT SUM(\"count\") AS \"Total Y-gyro count\" FROM \"y_gyro_count_by_day\" GROUP BY \"user\"",
               "rawQuery": true,
               "refId": "B",
               "resultFormat": "table",
@@ -1492,7 +1537,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"z_gyro\") AS \"Total Z-gyro count\" FROM \"MotionGyroscope\" GROUP BY \"user\"",
+              "query": "SELECT SUM(\"count\") AS \"Total Z-gyro count\" FROM \"z_gyro_count_by_day\" GROUP BY \"user\"",
               "rawQuery": true,
               "refId": "C",
               "resultFormat": "table",
@@ -1545,12 +1590,12 @@
                 "rgba(237, 129, 40, 0.89)",
                 "rgba(50, 172, 45, 0.97)"
               ],
-              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "dateFormat": "MMMM D, YYYY LT",
               "decimals": 2,
               "mappingType": 1,
               "pattern": "Time",
               "thresholds": [],
-              "type": "hidden",
+              "type": "date",
               "unit": "short"
             },
             {
@@ -1592,7 +1637,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"x_gyro\") AS \"X-gyro count\" FROM \"MotionGyroscope\" WHERE $timeFilter GROUP BY \"user\"",
+              "query": "SELECT SUM(\"count\") AS \"X-gyro count\" FROM \"x_gyro_count_by_day\" WHERE $timeFilter GROUP BY \"user\"",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "table",
@@ -1629,7 +1674,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"y_gyro\") AS \"Y-gyro count\" FROM \"MotionGyroscope\" WHERE $timeFilter GROUP BY \"user\"",
+              "query": "SELECT SUM(\"count\") AS \"Y-gyro count\" FROM \"y_gyro_count_by_day\" WHERE $timeFilter GROUP BY \"user\"",
               "rawQuery": true,
               "refId": "B",
               "resultFormat": "table",
@@ -1666,7 +1711,7 @@
               ],
               "orderByTime": "ASC",
               "policy": "default",
-              "query": "SELECT count(\"z_gyro\") AS \"Z-gyro count\" FROM \"MotionGyroscope\" WHERE $timeFilter GROUP BY \"user\"",
+              "query": "SELECT SUM(\"count\") AS \"Z-gyro count\" FROM \"z_gyro_count_by_day\" WHERE $timeFilter GROUP BY \"user\"",
               "rawQuery": true,
               "refId": "C",
               "resultFormat": "table",
@@ -1688,6 +1733,7 @@
             }
           ],
           "timeFrom": null,
+          "timeShift": "1m",
           "title": "Gyroscope data count by user on time filter period",
           "transform": "table",
           "type": "table"
@@ -2081,7 +2127,7 @@
     "list": []
   },
   "time": {
-    "from": "now-4M",
+    "from": "now-95d",
     "to": "now"
   },
   "timepicker": {

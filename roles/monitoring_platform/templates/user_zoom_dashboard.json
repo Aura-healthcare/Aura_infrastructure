@@ -1,4 +1,34 @@
 {
+  "__inputs": [
+    {
+      "name": "DS_INFLUXDB_PHYSIO_SIGNALS",
+      "label": "influxdb physio_signals",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "influxdb",
+      "pluginName": "InfluxDB"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "5.2.2"
+    },
+    {
+      "type": "panel",
+      "id": "graph",
+      "name": "Graph",
+      "version": "5.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "influxdb",
+      "name": "InfluxDB",
+      "version": "5.0.0"
+    }
+  ],
   "annotations": {
     "list": [
       {
@@ -15,7 +45,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1539085884182,
+  "id": null,
+  "iteration": 1539358119798,
   "links": [],
   "panels": [
     {
@@ -39,7 +70,7 @@
             "h": 13,
             "w": 24,
             "x": 0,
-            "y": 1
+            "y": 11
           },
           "id": 4,
           "legend": {
@@ -168,6 +199,120 @@
       "panels": [
         {
           "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "{{ aura_time_series_db_type }} {{ aura_physio_data_db_name }}",
+          "fill": 1,
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 2
+          },
+          "id": 46,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 1,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "orderByTime": "ASC",
+              "policy": "default",
+              "query": "SELECT mean(\"RrInterval\") FROM \"RrInterval\" WHERE (\"user\" =~ /^$user$/) AND $timeFilter GROUP BY time($interval) fill(linear)",
+              "rawQuery": true,
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Aggregated Rr Interval mean",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "aliasColors": {},
           "bars": true,
           "dashLength": 10,
           "dashes": false,
@@ -177,7 +322,7 @@
             "h": 8,
             "w": 24,
             "x": 0,
-            "y": 2
+            "y": 12
           },
           "id": 2,
           "legend": {
@@ -1734,10 +1879,7 @@
     "list": [
       {
         "allValue": null,
-        "current": {
-          "text": "ca48175a-bf0b-43bd-9e74-7cf92e2f35b1",
-          "value": "ca48175a-bf0b-43bd-9e74-7cf92e2f35b1"
-        },
+        "current": {},
         "datasource": "{{ aura_time_series_db_type }} {{ aura_physio_data_db_name }}",
         "hide": 1,
         "includeAll": false,
@@ -1758,8 +1900,8 @@
     ]
   },
   "time": {
-    "from": "now-4M",
-    "to": "now"
+    "from": "2018-07-18T08:26:33.687Z",
+    "to": "2018-07-18T14:20:28.727Z"
   },
   "timepicker": {
     "refresh_intervals": [
