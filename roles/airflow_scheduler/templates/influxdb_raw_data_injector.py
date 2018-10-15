@@ -258,8 +258,8 @@ def execute_write_pipeline(path_to_read_directory, path_for_written_files, path_
     start_time = time.time()
     for json_file in list_files_generator:
         is_writen = write_file_to_influxdb(json_file, path_to_read_directory, df_client)
-        #move_file_processed(json_file, is_writen, path_to_read_directory, path_for_written_files,
-        #                    path_for_problems_files)
+        move_file_processed(json_file, is_writen, path_to_read_directory, path_for_written_files,
+                            path_for_problems_files)
 
         if print_logs:
             # print logs

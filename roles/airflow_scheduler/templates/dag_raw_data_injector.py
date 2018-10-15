@@ -46,7 +46,10 @@ default_args = {
     # 'end_date': datetime(2016, 1, 1),
 }
 
-dag = DAG('raw_data_injector', default_args=default_args, schedule_interval="@hourly")
+# Crontab expression = every day, every hour between 17h and 00 h
+# 0,17,18,19,20,21,22,23 ? * * *
+dag = DAG('raw_data_injector', default_args=default_args,
+          schedule_interval="@hourly")
 
 write_data = PythonOperator(task_id='write_data_into_influxdb',
                             python_callable=execute_write_pipeline,
