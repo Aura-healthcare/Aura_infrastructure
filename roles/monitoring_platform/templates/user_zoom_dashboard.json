@@ -1900,8 +1900,8 @@
     ]
   },
   "time": {
-    "from": "2018-07-18T08:26:33.687Z",
-    "to": "2018-07-18T14:20:28.727Z"
+    "from": "now-100d",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [
