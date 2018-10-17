@@ -26,3 +26,7 @@
         host: "monitor.{{ domain }}"
         dest: "http://{{ aura_monitoring_platform_container }}:3000"
         host_gen_cert: true
+      airflow:
+        host: "scheduler.{{ domain }}"
+        dest: "http://{{ aura_scheduler_container }}:8080"
+        host_gen_cert: true

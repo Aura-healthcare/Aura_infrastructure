@@ -34,22 +34,18 @@ print("[Client created]")
 default_args = {
     'owner': 'Robin_Champseix',
     'depends_on_past': False,
-    'start_date': datetime(2018, 10, 16, 16, 1),
+    'start_date': datetime(2018, 10, 17, 11, 1),
     'email': ['rchampseix@octo.com'],
     'email_on_failure': True,
     'email_on_retry': False,
     'retries': 3,
-    'retry_delay': timedelta(minutes=1),
-    # 'queue': 'bash_queue',
-    # 'pool': 'backfill',
-    # 'priority_weight': 10,
+    'retry_delay': timedelta(minutes=10),
     # 'end_date': datetime(2016, 1, 1),
 }
 
 # Crontab expression = every day, every hour between 17h and 00 h
-# 0,17,18,19,20,21,22,23 ? * * *
 dag = DAG('raw_data_injector', default_args=default_args,
-          schedule_interval="@hourly")
+          schedule_interval="0 0,17,18,19,20,21,22,23 * * *")
 
 write_data = PythonOperator(task_id='write_data_into_influxdb',
                             python_callable=execute_write_pipeline,

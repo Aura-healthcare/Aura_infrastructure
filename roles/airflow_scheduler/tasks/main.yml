@@ -36,10 +36,3 @@
 
 - name: launch Airflow Scheduler in daemon process
   command: sudo docker exec airflow airflow scheduler -D
-
-#- name: Trigger specific dag raw_data_injector
-#  command: sudo docker exec airflow airflow trigger_dag raw_data_injector
-
-## TODO : launch test command "airflow unpause dag_id"
-#- name: unpause dag raw_data_injector
-#  command: sudo docker exec airflow airflow unpause raw_data_injector
