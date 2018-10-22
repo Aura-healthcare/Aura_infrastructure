@@ -1,13 +1,13 @@
 ---
 
-airflow_container_name: "airflow"
+aura_airflow_container_name: "airflow"
+aura_airflow_root_location: "/opt/docker-data/{{ aura_airflow_container_name }}"
 
-airflow_root_location: "/opt/docker-data/{{ airflow_container_name }}"
-airflow_script_location_test: "{{ airflow_root_location }}/script"
-airflow_data_input_location_test: "/opt/docker-data/{{ aura_backend_webserver_container }}/data/todo"
-airflow_data_output_success_location_test: "{{ airflow_root_location }}/data/success"
-airflow_data_output_failed_location_test: "{{ airflow_root_location }}/data/failed"
-airflow_requirements_location_test: "{{ airflow_root_location }}/requirements"
+aura_airflow_script_location: "{{ aura_airflow_root_location }}/script"
+aura_airflow_data_input_location: "/opt/docker-data/{{ aura_backend_webserver_container }}/data/todo"
+aura_airflow_data_output_success_location: "{{ aura_airflow_root_location }}/data/success"
+aura_airflow_data_output_failed_location: "{{ aura_airflow_root_location }}/data/failed"
+aura_airflow_requirements_location: "{{ aura_airflow_root_location }}/requirements"
 
 airflow_python_script_name: "dag_raw_data_injector.py"
 airflow_python_injector_methods_script_name: "influxdb_raw_data_injector.py"

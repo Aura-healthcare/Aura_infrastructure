@@ -3,11 +3,11 @@
 - include_role:
     name: .galaxy/ansible-airflow-in-docker
   vars:
-    airflow_container_name: "airflow"
-    airflow_script_location: "{{ airflow_script_location_test }}"
-    airflow_data_input_location: "{{ airflow_data_input_location_test }}"
-    airflow_data_output_success_location: "{{ airflow_data_output_success_location_test }}"
-    airflow_data_output_failed_location: "{{ airflow_data_output_failed_location_test }}"
+    airflow_container_name: "{{ aura_airflow_container_name }}"
+    airflow_script_location: "{{ aura_airflow_script_location }}"
+    airflow_data_input_location: "{{ aura_airflow_data_input_location }}"
+    airflow_data_output_success_location: "{{ aura_airflow_data_output_success_location }}"
+    airflow_data_output_failed_location: "{{ aura_airflow_data_output_failed_location }}"
     airflow_docker_networks:
       - name: "{{ aura_docker_network }}"
 
@@ -15,24 +15,24 @@
   become: true
   synchronize:
     src: files/
-    dest: "{{ airflow_requirements_location_test }}"
+    dest: "{{ aura_airflow_requirements_location }}"
     delete: yes
 
 - name: Restart container to install the custom requirements
   become: true
   docker_container:
-    name: "{{ airflow_container_name }}"
+    name: "{{ aura_airflow_container_name }}"
     image: rchampseix/airflow_aura
     state: started
     restart: yes
 
 - name: Copy templated raw_data_injector DAG script
   become: true
-  template: src="templates/{{ airflow_python_script_name }}" dest="{{ airflow_script_location_test }}/{{ airflow_python_script_name }}" mode=0644
+  template: src="templates/{{ airflow_python_script_name }}" dest="{{ aura_airflow_script_location }}/{{ airflow_python_script_name }}" mode=0644
 
 - name: Copy python file with methods to launch DAG raw_data_injector
   become: true
-  template: src="templates/{{ airflow_python_injector_methods_script_name }}" dest="{{ airflow_script_location_test }}/{{ airflow_python_injector_methods_script_name }}" mode=0644
+  template: src="templates/{{ airflow_python_injector_methods_script_name }}" dest="{{ aura_airflow_script_location }}/{{ airflow_python_injector_methods_script_name }}" mode=0644
 
 - name: launch Airflow Scheduler in daemon process
   command: sudo docker exec airflow airflow scheduler -D
