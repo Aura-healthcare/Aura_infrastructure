@@ -1,4 +1,0 @@
-- hosts: all
-  roles:
-    - role: airflow_scheduler
-      tags: airflow_scheduler
