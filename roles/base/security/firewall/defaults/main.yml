@@ -5,7 +5,6 @@ firewall_exposed_ports:
   - "3000/tcp"
   - "8888/tcp"
   - "8887/tcp"
-  - "8080/tcp"
 
 firewall_exposed_services:
   - "ssh"
