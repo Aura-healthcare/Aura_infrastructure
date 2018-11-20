@@ -25,6 +25,13 @@
     dest: "{{ aura_airflow_script_location }}/{{ airflow_python_script_name }}"
     mode: 0644
 
+- name: Copy templated config file
+  become: true
+  template:
+    src: "config.conf"
+    dest: "{{ aura_airflow_script_location }}/config.conf"
+    mode: 0644
+
 - name: Copy python file with methods to launch DAG raw_data_injector
   become: true
   template:
