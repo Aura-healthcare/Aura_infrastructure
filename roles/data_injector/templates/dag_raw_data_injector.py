@@ -12,7 +12,7 @@ from influxdb_raw_data_injector import (execute_acm_gyro_files_write_pipeline,
                                         execute_rri_files_write_pipeline)
 
 config = configparser.ConfigParser()
-config.read('config.conf')
+config.read('dags/config.conf')
 
 files_processing_paths = config["Paths"]
 PATH_TO_READ_DIRECTORY = files_processing_paths["read_directory"]
