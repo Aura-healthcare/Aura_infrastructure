@@ -1887,7 +1887,7 @@
         "multi": false,
         "name": "user",
         "options": [],
-        "query": "SHOW TAG VALUES FROM RrInterval WITH KEY = \"user\"",
+        "query": "SHOW TAG VALUES WITH KEY = \"user\"",
         "refresh": 2,
         "regex": "",
         "sort": 0,
