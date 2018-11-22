@@ -826,7 +826,7 @@
       "30d"
     ]
   },
-  "timezone": "UTC",
+  "timezone": "utc",
   "title": "Outliers dashboard",
   "uid": "fAqKqq1mk",
   "version": 1
