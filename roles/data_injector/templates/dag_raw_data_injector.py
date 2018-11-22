@@ -2,6 +2,7 @@
 # coding: utf-8
 """This script defines Dags to inject data into influxDB via airflow."""
 
+import os
 from datetime import datetime, timedelta
 import configparser
 from airflow import DAG
@@ -11,8 +12,10 @@ from influxdb import DataFrameClient
 from influxdb_raw_data_injector import (execute_acm_gyro_files_write_pipeline,
                                         execute_rri_files_write_pipeline)
 
+run_path = os.path.dirname(os.path.abspath(__file__))
+
 config = configparser.ConfigParser()
-config.read('dags/config.conf')
+config.read(run_path + '/config.conf')
 
 files_processing_paths = config["Paths"]
 PATH_TO_READ_DIRECTORY = files_processing_paths["read_directory"]
@@ -43,7 +46,7 @@ airflow_config = config["Airflow"]
 default_args = {
     'owner': airflow_config["owner"],
     'depends_on_past': False,
-    'start_date': datetime(2018, 10, 2, 14, 5),
+    'start_date': datetime(2018, 11, 11, 12, 30),
     'email': airflow_config["email"],
     'email_on_failure': True,
     'email_on_retry': False,

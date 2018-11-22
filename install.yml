@@ -22,5 +22,5 @@
       tags: reverse_proxy
     - role: monitoring_platform
       tags: monitoring_platform
-    - role: airflow_scheduler
-      tags: airflow_scheduler
+    - role: data_injector
+      tags: data_injector
