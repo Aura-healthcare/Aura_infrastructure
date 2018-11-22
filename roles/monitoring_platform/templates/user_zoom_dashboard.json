@@ -405,7 +405,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "RrInterval count per minute",
+          "title": "RrInterval count per 10 minutes",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -422,7 +422,7 @@
           "yaxes": [
             {
               "format": "short",
-              "label": "Count / min",
+              "label": "Count / 10 min",
               "logBase": 1,
               "max": null,
               "min": null,
