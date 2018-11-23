@@ -165,7 +165,7 @@
               "format": "short",
               "label": "Rr Interval (ms)",
               "logBase": 1,
-              "max": "2500",
+              "max": null,
               "min": null,
               "show": true
             },
@@ -173,7 +173,7 @@
               "format": "short",
               "label": null,
               "logBase": 1,
-              "max": "2500",
+              "max": null,
               "min": null,
               "show": true
             }
@@ -293,8 +293,8 @@
               "format": "short",
               "label": null,
               "logBase": 1,
-              "max": null,
-              "min": null,
+              "max": "1500",
+              "min": "300",
               "show": true
             },
             {
@@ -405,7 +405,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "RrInterval count per 10 minutes",
+          "title": "RrInterval count per minute",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -422,7 +422,7 @@
           "yaxes": [
             {
               "format": "short",
-              "label": "Count / 10 min",
+              "label": "Count / min",
               "logBase": 1,
               "max": null,
               "min": null,
