@@ -39,6 +39,13 @@
     dest: "{{ aura_airflow_script_location }}/{{ airflow_python_injector_methods_script_name }}"
     mode: 0644
 
+- name: Copy python file with methods to create energy feature points
+  become: true
+  template:
+    src: "{{ airflow_python_features_creator_script_name }}"
+    dest: "{{ aura_airflow_script_location }}/{{ airflow_python_features_creator_script_name }}"
+    mode: 0644
+
 - name: launch Airflow Scheduler in daemon process
   become: true
   command: docker exec airflow airflow scheduler -D

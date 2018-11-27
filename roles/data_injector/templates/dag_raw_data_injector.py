@@ -40,7 +40,7 @@ DF_CLIENT = DataFrameClient(host=HOST, port=PORT, username=USER, password=PASSWO
 print("[Client created]")
 
 # Create database
-CLIENT.create_database(DB_NAME)
+#CLIENT.create_database(DB_NAME)
 
 airflow_config = config["Airflow"]
 default_args = {

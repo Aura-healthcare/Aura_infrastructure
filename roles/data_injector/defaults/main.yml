@@ -11,6 +11,7 @@ aura_airflow_requirements_location: "{{ aura_airflow_root_location }}/requiremen
 
 airflow_python_script_name: "dag_raw_data_injector.py"
 airflow_python_injector_methods_script_name: "influxdb_raw_data_injector.py"
+airflow_python_features_creator_script_name: "features_creator.py"
 
 # variables inside container for Python files
 airflow_data_input_location_in_container: "/usr/local/airflow/todo/"
