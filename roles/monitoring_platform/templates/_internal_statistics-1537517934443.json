@@ -821,8 +821,8 @@
     "list": []
   },
   "time": {
-    "from": "2018-09-19T22:43:43.764Z",
-    "to": "2018-09-19T22:57:48.377Z"
+    "from": "now-2d",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -849,7 +849,7 @@
       "30d"
     ]
   },
-  "timezone": "",
+  "timezone": "utc",
   "title": "_internal statistics",
   "uid": "pv_W3romz",
   "version": 6
