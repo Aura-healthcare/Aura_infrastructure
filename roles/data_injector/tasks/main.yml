@@ -1,0 +1,51 @@
+---
+
+- name: Load requirements file content
+  become: true
+  set_fact:
+    aura_requirements_file_content: "{{ lookup('file', 'requirements.txt') }}"
+
+- include_role:
+    name: .galaxy/ansible-airflow-in-docker
+  vars:
+    airflow_container_name: "{{ aura_airflow_container_name }}"
+    airflow_script_location: "{{ aura_airflow_script_location }}"
+    airflow_requirements_file_content: "{{ aura_requirements_file_content }}"
+    # Data location in VM variables
+    airflow_data_input_location: "{{ aura_airflow_data_input_location }}"
+    airflow_data_output_success_location: "{{ aura_airflow_data_output_success_location }}"
+    airflow_data_output_failed_location: "{{ aura_airflow_data_output_failed_location }}"
+    airflow_docker_networks:
+      - name: "{{ aura_docker_network }}"
+
+- name: Copy templated raw_data_injector DAG script
+  become: true
+  template:
+    src: "{{ airflow_python_script_name }}"
+    dest: "{{ aura_airflow_script_location }}/{{ airflow_python_script_name }}"
+    mode: 0644
+
+- name: Copy templated config file
+  become: true
+  template:
+    src: "config.conf"
+    dest: "{{ aura_airflow_script_location }}/config.conf"
+    mode: 0644
+
+- name: Copy python file with methods to launch DAG raw_data_injector
+  become: true
+  template:
+    src: "{{ airflow_python_injector_methods_script_name }}"
+    dest: "{{ aura_airflow_script_location }}/{{ airflow_python_injector_methods_script_name }}"
+    mode: 0644
+
+- name: Copy python file with methods to create energy feature points
+  become: true
+  template:
+    src: "{{ airflow_python_features_creator_script_name }}"
+    dest: "{{ aura_airflow_script_location }}/{{ airflow_python_features_creator_script_name }}"
+    mode: 0644
+
+- name: launch Airflow Scheduler in daemon process
+  become: true
+  command: docker exec airflow airflow scheduler -D
