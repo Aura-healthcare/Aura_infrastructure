@@ -9,19 +9,14 @@ from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from influxdb import InfluxDBClient
 from influxdb import DataFrameClient
-from utils import get_user_list
-from energy_feature_injector import (extract_user_timestamp_json,
-                                     write_energy_and_update_timestamp)
+from energy_injector_methods import (extract_user_timestamp_json,
+                                     write_energy_and_update_timestamp,
+                                     get_user_list)
 
 run_path = os.path.dirname(os.path.abspath(__file__))
 
 config = configparser.ConfigParser()
-config.read('config.conf')
-
-files_processing_paths = config["Paths"]
-PATH_TO_READ_DIRECTORY = files_processing_paths["read_directory"]
-PATH_FOR_WRITTEN_FILES = files_processing_paths["success_files_directory"]
-PATH_FOR_PROBLEMS_FILES = files_processing_paths["failed_files_directory"]
+config.read(run_path + '/config.conf')
 
 influxdb_client_constants = config["Influxdb Client"]
 DB_NAME = influxdb_client_constants["database_name"]
@@ -62,7 +57,7 @@ default_args = {
     # 'end_date': datetime(2016, 1, 1),
 }
 
-dag = DAG('energy_data_injector', default_args=default_args, schedule_interval="@hourly")
+dag = DAG('energy_data_injector', default_args=default_args, schedule_interval="@daily")
 
 for user in user_list:
     write_energy_data = PythonOperator(task_id='write_energy_into_influxDB',
@@ -70,6 +65,7 @@ for user in user_list:
                                        op_kwargs={"user_id": user,
                                                   "timestamp_json_data": timestamp_json_data,
                                                   "json_data_file_path": JSON_DATA_FILE_PATH,
+                                                  "client": CLIENT,
                                                   "df_client": DF_CLIENT
                                                   },
                                        dag=dag)

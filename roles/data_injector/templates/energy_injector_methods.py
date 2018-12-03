@@ -105,24 +105,26 @@ def chunk_and_write_dataframe(dataframe_to_write: pd.DataFrame, measurement: str
     """
     # Write new features into influxdb - Chunk dataframe for influxdb performance issues
     chunk_nb = math.ceil(len(dataframe_to_write) / 5000)
-    for chunk in np.array_split(dataframe_to_write, chunk_nb):
+    print("There are {} chunked dataframe to write to influxdb".format(chunk_nb))
+    dataframe_chunk_list = np.array_split(dataframe_to_write, chunk_nb)
+    for chunk in dataframe_chunk_list:
         tags = {USER_PARAM_NAME: user_id}
         df_client.write_points(chunk, measurement=measurement, tags=tags, protocol="json")
     return True
 
 
-def extract_data_from_influxdb_query(measurement: str, user_id: str,
+def extract_data_from_influxdb_query(client, measurement: str, user_id: str,
                                      start_time: str, end_time: str):
     # Extract raw data from InfluxDB for D-day
     query = "SELECT * FROM {} WHERE \"user\" = '{}' and time > now() - {} and time < now() - {}".format(measurement,
                                                                                                         user_id,
                                                                                                         start_time,
                                                                                                         end_time)
-    extracted_data_result_set = CLIENT.query(query)
+    extracted_data_result_set = client.query(query)
     return extracted_data_result_set
 
 
-def write_user_energy_data(user_id: str, last_timestamp: str, df_client) -> bool:
+def write_user_energy_data(user_id: str, last_timestamp: str, client, df_client) -> bool:
     """
     TODO
 
@@ -137,13 +139,14 @@ def write_user_energy_data(user_id: str, last_timestamp: str, df_client) -> bool
     # Extract raw data from InfluxDB
     start = str(int(last_unix_timestamp)) + "ms"
     end = str(day_range_to_query) + "d"
-    extracted_data_result_set = extract_data_from_influxdb_query(ACCELEROMETER_MEASUREMENT_NAME,
+    extracted_data_result_set = extract_data_from_influxdb_query(client, ACCELEROMETER_MEASUREMENT_NAME,
                                                                  user_id, start, end)
     # Transform InfluxDB ResultSet in pandas Dataframe
     tags = {"user": user_id}
     try:
         raw_acm_dataframe = transform_acm_result_set_into_dataframe(extracted_data_result_set, tags)
-        # Create triaxial sum data points
+        print(raw_acm_dataframe.shape)
+    # Create triaxial sum data points
         triaxial_sum_dataframe = create_energy_data_points(raw_acm_dataframe)
         chunk_and_write_dataframe(triaxial_sum_dataframe, ACCELEROMETER_MEASUREMENT_NAME, user_id, df_client)
     except KeyError:
@@ -151,13 +154,14 @@ def write_user_energy_data(user_id: str, last_timestamp: str, df_client) -> bool
     for day in reversed(range(day_range_to_query)):
         # Extract raw data from InfluxDB for D-day
         start, end = str(day+1) + "d", str(day) + "d"
-        extracted_data_result_set = extract_data_from_influxdb_query(ACCELEROMETER_MEASUREMENT_NAME,
+        extracted_data_result_set = extract_data_from_influxdb_query(client, ACCELEROMETER_MEASUREMENT_NAME,
                                                                      user_id, start, end)
 
         # Transform InfluxDB ResultSet in pandas Dataframe
         tags = {"user": user_id}
         try:
             raw_acm_dataframe = transform_acm_result_set_into_dataframe(extracted_data_result_set, tags)
+            print(raw_acm_dataframe.shape)
         except KeyError:
             # If there is no data for D-day, skip processing
             continue
@@ -208,10 +212,10 @@ def update_user_timestamp(updated_timestamp, user, data, path_file):
         json.dump(timestamp_json_data, processed_data_timestamp)
 
 
-def write_energy_and_update_timestamp(user_id: str, timestamp_json_data, json_data_file_path, df_client):
+def write_energy_and_update_timestamp(user_id: str, timestamp_json_data, json_data_file_path, client, df_client):
     user_last_energy_timestamp = timestamp_json_data[user_id]
 
-    last_written_data_point_timestamp = write_user_energy_data(user, user_last_energy_timestamp, df_client)
+    last_written_data_point_timestamp = write_user_energy_data(user_id, user_last_energy_timestamp, client, df_client)
     update_user_timestamp(last_written_data_point_timestamp, user_id, timestamp_json_data, json_data_file_path)
 
 
@@ -241,4 +245,4 @@ if __name__ == "__main__":
     timestamp_json_data = extract_user_timestamp_json(JSON_DATA_FILE_PATH, user_list)
 
     for user in user_list:
-        write_energy_and_update_timestamp(user, timestamp_json_data, JSON_DATA_FILE_PATH, DF_CLIENT)
+        write_energy_and_update_timestamp(user, timestamp_json_data, JSON_DATA_FILE_PATH, CLIENT, DF_CLIENT)

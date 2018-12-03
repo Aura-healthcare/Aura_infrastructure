@@ -48,6 +48,7 @@
     mode: 0644
 
 - name: Copy energy_data_injector DAG script
+  become: true
   template:
     src: "{{ airflow_python_energy_dag_name }}"
     dest: "{{ aura_airflow_script_location }}/{{ airflow_python_energy_dag_name }}"
