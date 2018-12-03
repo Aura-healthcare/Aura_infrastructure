@@ -2,25 +2,25 @@
 
 - hosts: all
   roles:
-#    - role: base/security/firewall
-#      tags:
-#        - firewall
-#        - security
-#        - base
-#    - role: base/security/ssh
-#      tags:
-#        - ssh
-#        - security
-#        - base
-#    - role: time_series_db
-#      tags: time_series_db
-#    - role: jupyter
-#      tags: jupyter
-#    - role: backend_webserver
-#      tags: backend_webserver
-#    - role: reverse_proxy
-#      tags: reverse_proxy
-#    - role: monitoring_platform
-#      tags: monitoring_platform
+    - role: base/security/firewall
+      tags:
+        - firewall
+        - security
+        - base
+    - role: base/security/ssh
+      tags:
+        - ssh
+        - security
+        - base
+    - role: time_series_db
+      tags: time_series_db
+    - role: jupyter
+      tags: jupyter
+    - role: backend_webserver
+      tags: backend_webserver
+    - role: reverse_proxy
+      tags: reverse_proxy
+    - role: monitoring_platform
+      tags: monitoring_platform
     - role: data_injector
       tags: data_injector
