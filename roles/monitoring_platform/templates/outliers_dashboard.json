@@ -785,7 +785,7 @@
         "multi": false,
         "name": "user",
         "options": [],
-        "query": "SHOW TAG VALUES FROM MotionAccelerometer WITH KEY = \"user\"",
+        "query": "SHOW TAG VALUES WITH KEY = \"user\"",
         "refresh": 1,
         "regex": "",
         "sort": 0,
