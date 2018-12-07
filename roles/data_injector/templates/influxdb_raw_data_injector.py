@@ -177,7 +177,7 @@ def write_file_to_influxdb(file, path_to_data_test_directory, df_client):
     return write_success
 
 
-def move_file_processed(file, write_success, path_to_read_directory, path_for_written_files,
+def move_processed_file(file, write_success, path_to_read_directory, path_for_written_files,
                         path_for_problem_files):
     """
     Function dealing with the JSON file once it is processed
@@ -193,9 +193,8 @@ def move_file_processed(file, write_success, path_to_read_directory, path_for_wr
     """
     if write_success:
         # move file when write is done in influxdb
-        shutil.copy(src=path_to_read_directory + file,
+        shutil.move(src=path_to_read_directory + file,
                     dst=path_for_written_files + file)
-        os.remove(path=path_to_read_directory + file)
     else:
         shutil.move(src=path_to_read_directory + file,
                     dst=path_for_problem_files + file)
@@ -402,7 +401,7 @@ def execute_rri_files_write_pipeline(path_to_read_directory, path_for_written_fi
             write_success = False
 
         for json_file in user_rri_files:
-            move_file_processed(json_file.split("/")[-1], write_success, path_to_read_directory,
+            move_processed_file(json_file.split("/")[-1], write_success, path_to_read_directory,
                                 path_for_written_files, path_for_problems_files)
             if verbose:
                 file_processed_timestamp = str(datetime.datetime.now())
@@ -438,7 +437,7 @@ def execute_acm_gyro_files_write_pipeline(path_to_read_directory, path_for_writt
     list_files_generator = (file for file in list_files)
     for json_file in list_files_generator:
         is_writen = write_file_to_influxdb(json_file, path_to_read_directory, df_client)
-        move_file_processed(json_file, is_writen, path_to_read_directory, path_for_written_files,
+        move_processed_file(json_file, is_writen, path_to_read_directory, path_for_written_files,
                             path_for_problems_files)
 
         if verbose:
