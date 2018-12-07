@@ -9,8 +9,7 @@ from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from influxdb import InfluxDBClient
 from influxdb import DataFrameClient
-from energy_injector_methods import (extract_user_timestamp_json,
-                                     write_energy_and_update_timestamp,
+from energy_injector_methods import (create_and_write_energy_for_user,
                                      get_user_list)
 
 run_path = os.path.dirname(os.path.abspath(__file__))
@@ -25,21 +24,21 @@ PORT = int(influxdb_client_constants["port"])
 USER = influxdb_client_constants["user"]
 PASSWORD = influxdb_client_constants["password"]
 
+motion_acm_constants = config["Motion Accelerometer"]
+FIVE_SEC_THRESHOLD = motion_acm_constants["five_sec_threshold"]
+ONE_MIN_THRESHOLD = motion_acm_constants["one_min_threshold"]
+MAX_SUCCESSIVE_TIME_DIFF = motion_acm_constants["max_successive_time_diff"]
+ACCELEROMETER_MEASUREMENT_NAME = "MotionAccelerometer"
+
 # see InfluxDB Python API for more information
 # https://influxdb-python.readthedocs.io/en/latest/api-documentation.html
 CLIENT = InfluxDBClient(host=HOST, port=PORT, username=USER, password=PASSWORD,
                         database=DB_NAME)
-
-# Create influxDB dataframe client
 DF_CLIENT = DataFrameClient(host=HOST, port=PORT, username=USER, password=PASSWORD,
                             database=DB_NAME)
 print("[Client created]")
 
-MEASUREMENT = "MotionAccelerometer"
-user_list = get_user_list(CLIENT, MEASUREMENT)
-
-JSON_DATA_FILE_PATH = "processed_data_timestamp.json"
-timestamp_json_data = extract_user_timestamp_json(JSON_DATA_FILE_PATH, user_list)
+user_list = get_user_list(CLIENT)
 
 airflow_config = config["Airflow"]
 default_args = {
@@ -50,7 +49,7 @@ default_args = {
     'email_on_failure': True,
     'email_on_retry': False,
     'retries': 3,
-    'retry_delay': timedelta(minutes=1),
+    'retry_delay': timedelta(minutes=10),
     # 'queue': 'bash_queue',
     # 'pool': 'backfill',
     # 'priority_weight': 10,
@@ -60,13 +59,15 @@ default_args = {
 dag = DAG('energy_data_injector', default_args=default_args, schedule_interval="@daily")
 
 for user in user_list:
-    write_energy_data = PythonOperator(task_id='write_energy_into_influxDB',
-                                       python_callable=write_energy_and_update_timestamp,
+    write_energy_data = PythonOperator(task_id='create_and_write_energy_for_user',
+                                       python_callable=create_and_write_energy_for_user,
                                        op_kwargs={"user_id": user,
-                                                  "timestamp_json_data": timestamp_json_data,
-                                                  "json_data_file_path": JSON_DATA_FILE_PATH,
                                                   "client": CLIENT,
-                                                  "df_client": DF_CLIENT
+                                                  "df_client": DF_CLIENT,
+                                                  "accelerometer_measurement_name": ACCELEROMETER_MEASUREMENT_NAME,
+                                                  "five_sec_threshold": FIVE_SEC_THRESHOLD,
+                                                  "one_min_threshold": ONE_MIN_THRESHOLD,
+                                                  "max_successive_time_diff": MAX_SUCCESSIVE_TIME_DIFF,
                                                   },
                                        dag=dag)
     write_energy_data
