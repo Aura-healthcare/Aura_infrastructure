@@ -378,12 +378,16 @@ def execute_rri_files_write_pipeline(path_to_read_directory, path_for_written_fi
         # concat multiple files of each user
         concatenated_dataframe = concat_files_into_dataframe(files_list=user_rri_files)
 
+        # Calculated raw data count by min
+        rri_count_by_min = concatenated_dataframe.resample("1min").count()
+        rri_count_by_min.columns = ["rr_interval_count_by_min"]
+
         # Create new timestamp
         corrected_timestamp_list = create_corrected_timestamp_list(concatenated_dataframe)
         concatenated_dataframe.index = corrected_timestamp_list
         concatenated_dataframe.index.names = ["timestamp"]
 
-        # Open Json file
+        # Open Json file and extract tags informations
         try:
             with open(user_rri_files[0]) as json_file:
                 json_data = json.load(json_file)
@@ -393,9 +397,15 @@ def execute_rri_files_write_pipeline(path_to_read_directory, path_for_written_fi
             print("Impossible to open file.")
             write_success = False
 
+        # write raw RR-interval count by min to InfluxDB
+        try:
+            df_client.write_points(rri_count_by_min, measurement="RrInterval", tags=tags)
+        except:
+            print("Impossible to write RR-interval raw data count by min to influxDB.")
+
         print("DataFrame shape to write : {}".format(concatenated_dataframe.shape))
 
-        # write to InfluxDB
+        # write RR-interval with corrected timestamp to InfluxDB
         try:
             # Chunk dataframe for time series db performance issues
             chunk_nb = math.ceil(len(concatenated_dataframe) / 5000)
