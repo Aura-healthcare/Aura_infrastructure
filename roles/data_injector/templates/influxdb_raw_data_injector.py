@@ -5,6 +5,7 @@
 import shutil
 import datetime
 import os
+import math
 import glob
 import configparser
 import json
@@ -392,10 +393,19 @@ def execute_rri_files_write_pipeline(path_to_read_directory, path_for_written_fi
             print("Impossible to open file.")
             write_success = False
 
+        print("DataFrame shape to write : {}".format(concatenated_dataframe.shape))
+
         # write to InfluxDB
         try:
-            df_client.write_points(concatenated_dataframe, measurement="RrInterval", tags=tags,
-                                   protocol="json")
+            # Chunk dataframe for time series db performance issues
+            chunk_nb = math.ceil(len(concatenated_dataframe) / 5000)
+            print("There are {} chunks to write.".format(chunk_nb))
+            dataframe_chunk_list = np.array_split(concatenated_dataframe, chunk_nb)
+
+            # Write each chunk in time series db
+            for chunk in dataframe_chunk_list:
+                df_client.write_points(chunk, measurement="RrInterval", tags=tags,
+                                       protocol="json")
         except:
             print("Impossible to write file to influxDB")
             write_success = False
