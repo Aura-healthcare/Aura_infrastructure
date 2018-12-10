@@ -3,9 +3,9 @@
 """This script defines methods to write JSON data into InfluxDB."""
 
 import shutil
+import math
 import datetime
 import os
-import math
 import glob
 import configparser
 import json
@@ -22,9 +22,9 @@ DEVICE_PARAM_NAME = "device_address"
 # ---------------- JSON TO DATAFRAME CONVERSION ---------------- #
 
 
-def convert_acm_json_to_df(acm_json):
+def convert_acm_json_to_df(acm_json: dict) -> pd.DataFrame:
     """
-    Function converting accelerometer JSON data to a pandas Dataframe
+    Function converting accelerometer JSON data to pandas Dataframe.
 
     Arguments
     ---------
@@ -35,10 +35,10 @@ def convert_acm_json_to_df(acm_json):
     df_to_write - Dataframe to write in influxDB
     """
     # Extract values to write to InfluxDB
-    data_to_convert = list(map(lambda x: x.split(" "), acm_json["data"]))
+    extracted_data_from_json_file = list(map(lambda x: x.split(" "), acm_json["data"]))
 
     columns = ["timestamp", "x_acm", "y_acm", "z_acm", "sensibility"]
-    df_to_write = pd.DataFrame(data_to_convert, columns=columns).set_index("timestamp")
+    df_to_write = pd.DataFrame(extracted_data_from_json_file, columns=columns).set_index("timestamp")
 
     # Convert string to numeric values
     df_to_write[["x_acm", "y_acm", "z_acm"]] = df_to_write[["x_acm", "y_acm", "z_acm"]].apply(pd.to_numeric)
@@ -47,9 +47,9 @@ def convert_acm_json_to_df(acm_json):
     return df_to_write
 
 
-def convert_rri_json_to_df(rri_json):
+def convert_rri_json_to_df(rri_json) -> pd.DataFrame:
     """
-    Function converting RrInterval JSON data to a pandas Dataframe
+    Function converting RrInterval JSON data to pandas Dataframe.
 
     Arguments
     ---------
@@ -60,10 +60,10 @@ def convert_rri_json_to_df(rri_json):
     df_to_write - Dataframe to write in influxDB
     """
     # Extract values to write to InfluxDB
-    data_to_convert = list(map(lambda x: x.split(" "), rri_json["data"]))
+    extracted_data_from_json_file = list(map(lambda x: x.split(" "), rri_json["data"]))
 
     columns = ["timestamp", "RrInterval"]
-    df_to_write = pd.DataFrame(data_to_convert, columns=columns).set_index("timestamp")
+    df_to_write = pd.DataFrame(extracted_data_from_json_file, columns=columns).set_index("timestamp")
 
     # Convert string to numeric values
     df_to_write["RrInterval"] = df_to_write["RrInterval"].apply(pd.to_numeric)
@@ -72,9 +72,9 @@ def convert_rri_json_to_df(rri_json):
     return df_to_write
 
 
-def convert_gyro_json_to_df(gyro_json):
+def convert_gyro_json_to_df(gyro_json) -> pd.DataFrame:
     """
-    Function converting gyroscope JSON data to a pandas Dataframe
+    Function converting gyroscope JSON data to pandas Dataframe.
 
     Arguments
     ---------
@@ -85,10 +85,10 @@ def convert_gyro_json_to_df(gyro_json):
     df_to_write - Dataframe to write in influxDB
     """
     # Extract values to write to InfluxDB
-    data_to_convert = list(map(lambda x: x.split(" "), gyro_json["data"]))
+    extracted_data_from_json_file = list(map(lambda x: x.split(" "), gyro_json["data"]))
 
     columns = ["timestamp", "x_gyro", "y_gyro", "z_gyro"]
-    df_to_write = pd.DataFrame(data_to_convert, columns=columns).set_index("timestamp")
+    df_to_write = pd.DataFrame(extracted_data_from_json_file, columns=columns).set_index("timestamp")
 
     # Convert string to numeric values
     df_to_write[["x_gyro", "y_gyro", "z_gyro"]] = df_to_write[["x_gyro", "y_gyro", "z_gyro"]].apply(pd.to_numeric)
@@ -100,32 +100,35 @@ def convert_gyro_json_to_df(gyro_json):
 # ---------------- PROCESSING FILES ---------------- #
 
 
-def create_df_with_unique_index(data_to_write):
+def create_df_with_unique_index(data_to_write: pd.DataFrame,
+                                time_delta_to_add: int = 123456) -> pd.DataFrame:
     """
-    Function creating a new Dataframe with a unique index
+    Function creating a new Dataframe with a unique index to avoid points overwrite in time series DB.
 
     Arguments
     ---------
     data_to_write - data to inject in influxDB
+    time_delta_to_add - timedelta to add, in ns, to avoid having 2 points with same timestamp index
 
     Returns
     ---------
-    data_with_unique_index - pandas Dataframe ith unique index to avoid overwritten points
+    data_with_unique_index - pandas Dataframe with unique index to avoid overwritten points
     in influxDB
     """
     # Checking if index of data is unique to avoid overwritten points in InfluxDB
     is_index_unique = data_to_write.index.is_unique
     while not is_index_unique:
         data_to_write.index = data_to_write.index.where(~data_to_write.index.duplicated(),
-                                                        data_to_write.index + pd.to_timedelta(123456, unit='ns'))
+                                                        data_to_write.index + pd.to_timedelta(time_delta_to_add,
+                                                                                              unit='ns'))
         data_to_write = data_to_write.sort_index()
         is_index_unique = data_to_write.index.is_unique
     return data_to_write
 
 
-def write_file_to_influxdb(file, path_to_data_test_directory, df_client):
+def write_file_to_influxdb(file: str, path_to_files: str, df_client) -> bool:
     """
-    Function writing JSON file to influxDB
+    Function writing JSON file to influxDB.
 
     Arguments
     ---------
@@ -141,7 +144,7 @@ def write_file_to_influxdb(file, path_to_data_test_directory, df_client):
 
     # Open Json file
     try:
-        with open(path_to_data_test_directory + file) as json_file:
+        with open(path_to_files + file) as json_file:
             json_data = json.load(json_file)
         # Get tags from file
         measurement = json_data[TYPE_PARAM_NAME]
@@ -178,10 +181,10 @@ def write_file_to_influxdb(file, path_to_data_test_directory, df_client):
     return write_success
 
 
-def move_processed_file(file, write_success, path_to_read_directory, path_for_written_files,
-                        path_for_problem_files):
+def move_processed_file(file: str, write_success: bool, path_to_read_directory: str,
+                        path_for_written_files: str, path_for_problem_files: str):
     """
-    Function dealing with the JSON file once it is processed
+    Function dealing with the JSON file once it is processed.
 
     Arguments
     ---------
@@ -199,31 +202,6 @@ def move_processed_file(file, write_success, path_to_read_directory, path_for_wr
     else:
         shutil.move(src=path_to_read_directory + file,
                     dst=path_for_problem_files + file)
-
-
-def test_influxdb(df_client, nb_points):
-    """
-    Function to test influxDB's ability to write points
-
-    Arguments
-    ---------
-    df_client - Dataframe InfluxDB Client
-    nb_points - number of points to write to influxDB in a one time try
-
-    """
-    # Get tags for test df
-    measurement = "test"
-    tags = {"user": "robin", "device_address": "iphone"}
-
-    for i in range(10, 30):
-        # Test resistance of InfluxDB
-        nb_points = nb_points
-        dates = pd.date_range("201808" + str(i), periods=nb_points, freq="S")
-        columns = ["RrInterval_test"]
-        data_to_write = pd.DataFrame(np.random.randint(500, 1000, nb_points),
-                                     index=dates, columns=columns)
-
-        df_client.write_points(data_to_write, measurement=measurement, tags=tags, protocol="json")
 
 
 def create_files_by_user_dict(files_list: list) -> dict:
@@ -245,7 +223,6 @@ def create_files_by_user_dict(files_list: list) -> dict:
             'user_3': ["file_6", "file_7", "file_8"]
     }
     """
-
     # Create sorted user list
     user_list = list(set(map(lambda x: x.split("/")[-1].split("_")[0], files_list)))
     user_list.sort()
@@ -270,7 +247,7 @@ def create_files_by_user_dict(files_list: list) -> dict:
     return files_by_user_dict
 
 
-def concat_files_into_dataframe(files_list: list) -> pd.DataFrame:
+def concat_rrinterval_files_into_single_dataframe(files_list: list) -> pd.DataFrame:
     """
     Concatenate JSON files content into a single pandas DataFrame.
 
@@ -280,7 +257,7 @@ def concat_files_into_dataframe(files_list: list) -> pd.DataFrame:
 
     Returns
     ---------
-    concatened_dataframe - resulting pandas DataFrame
+    concatenated_rr_interval_dataframe - resulting pandas DataFrame
     """
     dataframe_list = []
     for file in files_list:
@@ -293,15 +270,15 @@ def concat_files_into_dataframe(files_list: list) -> pd.DataFrame:
 
         # Extract data and create dataframe from JSON file
         if measurement == "RrInterval":
-            df = convert_rri_json_to_df(json_data)
-            dataframe_list.append(df)
+            rr_interval_dataframe = convert_rri_json_to_df(json_data)
+            dataframe_list.append(rr_interval_dataframe)
 
     # Concat list of dataframe
-    concatened_dataframe = pd.concat(dataframe_list)
-    return concatened_dataframe
+    concatenated_rr_interval_dataframe = pd.concat(dataframe_list)
+    return concatenated_rr_interval_dataframe
 
 
-def create_corrected_timestamp_list(concatenated_df: pd.DataFrame) -> list:
+def create_corrected_timestamp_list(concatenated_rr_interval_dataframe: pd.DataFrame) -> list:
     """
     Create a corrected timestamp based on cumulative sum of RR-intervals values.
 
@@ -313,9 +290,8 @@ def create_corrected_timestamp_list(concatenated_df: pd.DataFrame) -> list:
     ---------
     corrected_timestamp_list - Corrected timestamp generated
     """
-
-    rri_list = concatenated_df["RrInterval"].values
-    polar_index = concatenated_df.index
+    rri_list = concatenated_rr_interval_dataframe["RrInterval"].values
+    polar_index = concatenated_rr_interval_dataframe.index
 
     current_timestamp = polar_index[0]
     next_timestamp = polar_index[1]
@@ -324,26 +300,44 @@ def create_corrected_timestamp_list(concatenated_df: pd.DataFrame) -> list:
     corrected_timestamp_list = [current_timestamp]
 
     for i in range(1, len(polar_index) - 1):
+        next_corrected_timestamp = get_next_timestamp(next_timestamp, current_timestamp,
+                                                      corrected_timestamp_list[-1], rri_list[i])
+        corrected_timestamp_list.append(next_corrected_timestamp)
 
-        time_difference = next_timestamp - current_timestamp
-        if abs(time_difference.seconds) < 3:
-            next_corrected_timestamp = corrected_timestamp_list[-1] + datetime.timedelta(milliseconds=np.float64(rri_list[i]))
-            corrected_timestamp_list.append(next_corrected_timestamp)
-        else:
-            corrected_timestamp_list.append(next_timestamp)
-
-        # Update timestamps to compare
+        # Update next timestamps to compute time difference
         current_timestamp = polar_index[i]
         next_timestamp = polar_index[i+1]
 
-    last_timestamp = corrected_timestamp_list[-1] + datetime.timedelta(milliseconds=np.float64(rri_list[-1]))
-    corrected_timestamp_list.append(last_timestamp)
+    # Deal with last timestamp value
+    next_corrected_timestamp = get_next_timestamp(next_timestamp, current_timestamp,
+                                                  corrected_timestamp_list[-1], rri_list[-1])
+    corrected_timestamp_list.append(next_corrected_timestamp)
 
     return corrected_timestamp_list
 
 
-def execute_rri_files_write_pipeline(path_to_read_directory, path_for_written_files,
-                                     path_for_problems_files, df_client, verbose=False):
+def get_next_timestamp(next_timestamp, current_timestamp, last_corrected_timestamp,
+                       next_rr_interval: float):
+    """
+
+    :param next_timestamp:
+    :param current_timestamp:
+    :param last_corrected_timestamp:
+    :param next_rr_interval:
+    :return:
+    """
+    # Deal with last timestamp value
+    time_difference = next_timestamp - current_timestamp
+    if abs(time_difference.seconds) < 3:
+        next_corrected_timestamp = last_corrected_timestamp + \
+                                   datetime.timedelta(milliseconds=np.float64(next_rr_interval))
+        return next_corrected_timestamp
+    else:
+        return next_timestamp
+
+
+def execute_rri_files_write_pipeline(path_to_read_directory: str, path_for_written_files: str,
+                                     path_for_problems_files: str, df_client, verbose: bool = False):
     """
     Process all files in the read directory to write them to influxDB.
 
@@ -355,7 +349,7 @@ def execute_rri_files_write_pipeline(path_to_read_directory, path_for_written_fi
     df_client - Dataframe InfluxDB Client
     verbose - Option to print some logs informations about process.
     """
-    # files list containing RR-Interval in directory
+    # Get files list containing RR-Interval in directory
     rri_files_list = glob.glob(path_to_read_directory + "*RrInterval*")
     rri_files_list.sort()
     if verbose:
@@ -364,7 +358,8 @@ def execute_rri_files_write_pipeline(path_to_read_directory, path_for_written_fi
     # group and sort files by user
     sorted_rri_files_dict = create_files_by_user_dict(rri_files_list)
 
-    # Creating directory for processed files
+    # Creating directory for processed file
+    # ---------- DELETE IN PRODUCTION MODE ---------- #
     if not os.path.exists(path_for_written_files):
         os.makedirs(path_for_written_files)
     if not os.path.exists(path_for_problems_files):
@@ -376,10 +371,10 @@ def execute_rri_files_write_pipeline(path_to_read_directory, path_for_written_fi
         user_rri_files = sorted_rri_files_dict[user]
 
         # concat multiple files of each user
-        concatenated_dataframe = concat_files_into_dataframe(files_list=user_rri_files)
+        concatenated_dataframe = concat_rrinterval_files_into_single_dataframe(files_list=user_rri_files)
 
-        # Calculated raw data count by min
-        rri_count_by_min = concatenated_dataframe.resample("1min").count()
+        # GET raw data count by min
+        rri_count_by_min = concatenated_dataframe.resample("1min", label="right").count()
         rri_count_by_min.columns = ["rr_interval_count_by_min"]
 
         # Create new timestamp
@@ -387,7 +382,7 @@ def execute_rri_files_write_pipeline(path_to_read_directory, path_for_written_fi
         concatenated_dataframe.index = corrected_timestamp_list
         concatenated_dataframe.index.names = ["timestamp"]
 
-        # Open Json file and extract tags informations
+        # Open Json file
         try:
             with open(user_rri_files[0]) as json_file:
                 json_data = json.load(json_file)
@@ -399,23 +394,16 @@ def execute_rri_files_write_pipeline(path_to_read_directory, path_for_written_fi
 
         # write raw RR-interval count by min to InfluxDB
         try:
-            df_client.write_points(rri_count_by_min, measurement="RrInterval", tags=tags)
+            chunk_and_write_dataframe(rri_count_by_min, measurement="RrInterval", tags=tags,
+                                      user_id=user, df_client=df_client, batch_size=5000)
         except:
             print("Impossible to write RR-interval raw data count by min to influxDB.")
 
-        print("DataFrame shape to write : {}".format(concatenated_dataframe.shape))
-
-        # write RR-interval with corrected timestamp to InfluxDB
+        print("DF SHAPE : {}".format(concatenated_dataframe.shape))
+        # write processed rr_interval data to InfluxDB
         try:
-            # Chunk dataframe for time series db performance issues
-            chunk_nb = math.ceil(len(concatenated_dataframe) / 5000)
-            print("There are {} chunks to write.".format(chunk_nb))
-            dataframe_chunk_list = np.array_split(concatenated_dataframe, chunk_nb)
-
-            # Write each chunk in time series db
-            for chunk in dataframe_chunk_list:
-                df_client.write_points(chunk, measurement="RrInterval", tags=tags,
-                                       protocol="json")
+            chunk_and_write_dataframe(concatenated_dataframe, measurement="RrInterval",
+                                      user_id=user, df_client=df_client, batch_size=5000)
         except:
             print("Impossible to write file to influxDB")
             write_success = False
@@ -429,8 +417,31 @@ def execute_rri_files_write_pipeline(path_to_read_directory, path_for_written_fi
                 print(log)
 
 
-def execute_acm_gyro_files_write_pipeline(path_to_read_directory, path_for_written_files,
-                                          path_for_problems_files, df_client, verbose=False):
+def chunk_and_write_dataframe(dataframe_to_write: pd.DataFrame, measurement: str,
+                              user_id: str, df_client, batch_size: int = 5000) -> bool:
+    """
+
+    :param dataframe_to_write:
+    :param measurement:
+    :param user_id:
+    :param df_client:
+    :param batch_size:
+    :return:
+    """
+    # Chunk dataframe for time series db performance issues
+    chunk_nb = math.ceil(len(dataframe_to_write) / batch_size)
+    print("There are {} chunks to write.".format(chunk_nb))
+
+    dataframe_chunk_list = np.array_split(dataframe_to_write, chunk_nb)
+    # Write each chunk in time series db
+    for chunk in dataframe_chunk_list:
+        tags = {USER_PARAM_NAME: user_id}
+        df_client.write_points(chunk, measurement=measurement, tags=tags, protocol="json")
+    return True
+
+
+def execute_acm_gyro_files_write_pipeline(path_to_read_directory: str, path_for_written_files: str,
+                                          path_for_problems_files: str, df_client, verbose=False):
     """
     Process all gyroscope and accelerometer files in the read directory to write them to influxDB.
 
@@ -448,6 +459,7 @@ def execute_acm_gyro_files_write_pipeline(path_to_read_directory, path_for_writt
         print("There are currently {} files.".format(len(list_files)))
 
     # Creating directory for processed files
+    # ---------- DELETE IN PRODUCTION MODE ---------- #
     if not os.path.exists(path_for_written_files):
         os.makedirs(path_for_written_files)
     if not os.path.exists(path_for_problems_files):

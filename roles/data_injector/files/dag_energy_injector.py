@@ -38,7 +38,8 @@ DF_CLIENT = DataFrameClient(host=HOST, port=PORT, username=USER, password=PASSWO
                             database=DB_NAME)
 print("[Client created]")
 
-user_list = get_user_list(CLIENT)
+ACCELEROMETER_MEASUREMENT_NAME = "MotionAccelerometer"
+user_list = get_user_list(CLIENT, measurement=ACCELEROMETER_MEASUREMENT_NAME)
 
 airflow_config = config["Airflow"]
 default_args = {

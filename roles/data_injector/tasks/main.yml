@@ -28,28 +28,28 @@
 
 - name: Copy python file with methods to launch DAG raw_data_injector
   become: true
-  template:
+  copy:
     src: "{{ airflow_python_raw_data_injector_methods_script_name }}"
     dest: "{{ aura_airflow_script_location }}/{{ airflow_python_raw_data_injector_methods_script_name }}"
     mode: 0644
 
 - name: Copy python file with methods to launch DAG energy_data_injector
   become: true
-  template:
+  copy:
     src: "{{ airflow_python_energy_injector_methods_script_name }}"
     dest: "{{ aura_airflow_script_location }}/{{ airflow_python_energy_injector_methods_script_name }}"
     mode: 0644
 
 - name: Copy raw_data_injector DAG script
   become: true
-  template:
+  copy:
     src: "{{ airflow_python_raw_data_dag_name }}"
     dest: "{{ aura_airflow_script_location }}/{{ airflow_python_raw_data_dag_name }}"
     mode: 0644
 
 - name: Copy energy_data_injector DAG script
   become: true
-  template:
+  copy:
     src: "{{ airflow_python_energy_dag_name }}"
     dest: "{{ aura_airflow_script_location }}/{{ airflow_python_energy_dag_name }}"
     mode: 0644

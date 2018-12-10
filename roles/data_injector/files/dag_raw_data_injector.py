@@ -33,8 +33,6 @@ PASSWORD = influxdb_client_constants["password"]
 # https://influxdb-python.readthedocs.io/en/latest/api-documentation.html
 CLIENT = InfluxDBClient(host=HOST, port=PORT, username=USER, password=PASSWORD,
                         database=DB_NAME)
-
-# Create influxDB dataframe client
 DF_CLIENT = DataFrameClient(host=HOST, port=PORT, username=USER, password=PASSWORD,
                             database=DB_NAME)
 print("[Client created]")

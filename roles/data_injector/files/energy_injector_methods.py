@@ -18,24 +18,26 @@ DEVICE_PARAM_NAME = "device_address"
 
 ACCELEROMETER_MEASUREMENT_NAME = "MotionAccelerometer"
 
+
 # --------------------- FUNCTIONS TO QUERY INFLUXDB --------------------- #
 
-
-def get_user_list(client) -> List[str]:
+def get_user_list(client, measurement: str) -> List[str]:
     """
-    Get the list of all distinct user in the influxDB database.
+    Get the list of all distinct user in the influxDB database with specified measurement data.
 
     Arguments
     ---------
     client: Client object
         influxDB client to connect to database.
+    measurement: str
+        Type of measurement of interest to extract user list.
 
     :return usr_list: list of all distinct user in database.
     """
     # Get list of all users
     influx_query = "SHOW TAG VALUES WITH KEY = \"user\""
     query_result = client.query(influx_query)
-    user_values_dict = list(query_result.get_points())
+    user_values_dict = list(query_result.get_points(measurement=measurement))
 
     usr_list = []
     for elt in user_values_dict:
@@ -46,12 +48,13 @@ def get_user_list(client) -> List[str]:
 
 def extract_raw_data_from_influxdb(client, measurement: str, user_id: str, start_time: str, end_time: str):
     """
-    TODO
-    :param client:
-    :param measurement:
-    :param user_id:
-    :param start_time:
-    :param end_time:
+    Extract raw data from influxDB.
+
+    :param client: influxdb client
+    :param measurement: measurement name
+    :param user_id: id of user
+    :param start_time: first timestamp for query
+    :param end_time: last timestamp for query
     :return extracted_result_set: influxDB object containing extracted data
     """
     # Extract raw data from InfluxDB for D-day
@@ -68,10 +71,11 @@ def extract_raw_data_from_influxdb(client, measurement: str, user_id: str, start
 
 def get_first_timestamp_to_compute_energy(user_id: str, client):
     """
+    Retruns the first timestamp from which whe need to compute the energy.
 
-    :param user_id:
-    :param client:
-    :return:
+    :param user_id: if of user
+    :param client: influxdb client
+    :return first_timestamp_to_compute_energy: timestamp
     """
     query = "SELECT last(\"energy_by_5s\") FROM MotionAccelerometer WHERE \"user\" = '{}'".format(user_id)
     extracted_data_result_set = client.query(query)
@@ -87,22 +91,26 @@ def get_first_timestamp_to_compute_energy(user_id: str, client):
         print("[Calculating energy from all MotionAccelerometer data]")
         query = "SELECT first(\"x_acm\") FROM MotionAccelerometer WHERE \"user\" = '{}'".format(user_id)
         extracted_data_result_set = client.query(query)
-        first_acm_timestamp_for_user = list(extracted_data_result_set.get_points())
-        first_timestamp_to_compute_energy = first_acm_timestamp_for_user[0]["time"]
+        if extracted_data_result_set:
+            first_acm_timestamp_for_user = list(extracted_data_result_set.get_points())
+            first_timestamp_to_compute_energy = first_acm_timestamp_for_user[0]["time"]
 
-    return pd.to_datetime(first_timestamp_to_compute_energy, unit="ns")
+    first_timestamp_to_compute_energy = pd.to_datetime(first_timestamp_to_compute_energy, unit="ns")
+    return first_timestamp_to_compute_energy
 
 
 def get_time_difference_between_now_and_timestamp(timestamp):
     """
-    TODO
-    :param timestamp:
-    :return:
+    Returns a timedelta in days, between current time and input timestamp
+
+    :param timestamp: input timestamp
+    :return days_time_delta: time difference with current time in days
     """
     current_timestamp = datetime.datetime.now()
     time_delta = current_timestamp - timestamp
 
-    return time_delta.days
+    days_time_delta = time_delta.days
+    return days_time_delta
 
 
 # --------------------- FUNCTIONS TO COMPUTE ENERGY FROM ACM QUERY RESULT --------------------- #
@@ -110,7 +118,7 @@ def get_time_difference_between_now_and_timestamp(timestamp):
 
 def transform_acm_result_set_into_dataframe(result_set: str, tags: dict) -> pd.DataFrame:
     """
-    TODO
+    Returns extracted accelerometer data from influxDB ResulSet object.
 
     :param result_set:
     :param tags:
@@ -126,12 +134,13 @@ def transform_acm_result_set_into_dataframe(result_set: str, tags: dict) -> pd.D
 def create_energy_dataframe(acm_dataframe: pd.DataFrame, aggregation_count_threshold: int,
                             max_successive_time_diff: str, aggregation_time: str) -> pd.DataFrame:
     """
-    TODO
-    :param acm_dataframe:
-    :param aggregation_count_threshold:
-    :param max_successive_time_diff:
-    :param aggregation_time:
-    :return:
+    Creates energy feature from raw accelerometer data and returns result as a dataframe.
+
+    :param acm_dataframe: raw accelerometer dataframe
+    :param aggregation_count_threshold: threshold above which we compute energy.
+    :param max_successive_time_diff: maximum difference between successive timestamp below which we compute energy
+    :param aggregation_time: time by which we aggreagte energy result.
+    :return energy_dataframe: pandas dataframe object with 1 column, the energy, indexed by time
     """
     max_successive_time_diff_boolean_mask = acm_dataframe["time"].diff(periods=1) < max_successive_time_diff
     consecutive_differences_dataframe = acm_dataframe.diff(periods=1)[max_successive_time_diff_boolean_mask].drop(["time"], axis=1)
@@ -158,6 +167,8 @@ def create_energy_dataframe(acm_dataframe: pd.DataFrame, aggregation_count_thres
 def chunk_and_write_dataframe(dataframe_to_write: pd.DataFrame, measurement: str,
                               user_id: str, df_client, batch_size: int = 5000) -> bool:
     """
+    Split the input dataframe in chunk and write them sequentially for perfomance issues
+
     :param dataframe_to_write:
     :param measurement:
     :param user_id:
@@ -174,8 +185,8 @@ def chunk_and_write_dataframe(dataframe_to_write: pd.DataFrame, measurement: str
     return True
 
 
-def create_and_write_energy_for_user(user_id, client, df_client, accelerometer_measurement_name,
-                                     five_sec_threshold, one_min_threshold, max_successive_time_diff,
+def create_and_write_energy_for_user(user_id: str, client, df_client, accelerometer_measurement_name: str,
+                                     five_sec_threshold: int, one_min_threshold: int, max_successive_time_diff: str,
                                      batch_size=5000):
     print("-----------------------")
     print("[Creation of features] user {}".format(user_id))
@@ -221,6 +232,7 @@ def create_and_write_energy_for_user(user_id, client, df_client, accelerometer_m
         print("[Written process done]")
 
 
+
 if __name__ == "__main__":
 
     config = configparser.ConfigParser()
@@ -246,7 +258,7 @@ if __name__ == "__main__":
     DF_CLIENT = DataFrameClient(host=HOST, port=PORT, username=USER, password=PASSWORD, database=DB_NAME)
     print("[Client created]")
 
-    user_list = get_user_list(CLIENT)
+    user_list = get_user_list(CLIENT, measurement=ACCELEROMETER_MEASUREMENT_NAME)
 
     for user_id in user_list:
         create_and_write_energy_for_user(user_id, CLIENT, DF_CLIENT, ACCELEROMETER_MEASUREMENT_NAME,
