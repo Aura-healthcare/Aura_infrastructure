@@ -1,23 +1,25 @@
 ---
 
-- name: Load requirements file content
+- name: create airflow local directories
   become: true
-  set_fact:
-    aura_requirements_file_content: "{{ lookup('file', 'requirements.txt') }}"
+  file:
+    path: "{{ item }}"
+    owner: 1000
+    state: directory
+    recurse: true
+  with_items:
+    - "{{ aura_airflow_script_location }}"
+    - "{{ aura_airflow_data_input_location }}"
+    - "{{ aura_airflow_data_output_success_location }}"
+    - "{{ aura_airflow_data_output_failed_location }}"
+    - "{{ aura_airflow_requirements_location }}"
 
-- include_role:
-    name: .galaxy/ansible-airflow-in-docker
-  vars:
-    airflow_container_name: "{{ aura_airflow_container_name }}"
-    airflow_script_location: "{{ aura_airflow_script_location }}"
-    airflow_requirements_file_content: "{{ aura_requirements_file_content }}"
-
-    # Data location in VM variables
-    airflow_data_input_location: "{{ aura_airflow_data_input_location }}"
-    airflow_data_output_success_location: "{{ aura_airflow_data_output_success_location }}"
-    airflow_data_output_failed_location: "{{ aura_airflow_data_output_failed_location }}"
-    airflow_docker_networks:
-      - name: "{{ aura_docker_network }}"
+- name: Copy docker-compose yaml file
+  become: true
+  template:
+    src: "docker-compose.yml"
+    dest: "{{ aura_airflow_root_location }}/docker-compose.yml"
+    mode: 0644
 
 - name: Copy templated config file
   become: true
@@ -26,34 +28,58 @@
     dest: "{{ aura_airflow_script_location }}/config.conf"
     mode: 0644
 
+- name: Copy Python requirements for DAGS scripts
+  become: true
+  copy:
+    src: "requirements.txt"
+    dest: "{{ aura_airflow_requirements_location }}/requirements.txt"
+    mode: 0644
+
 - name: Copy python file with methods to launch DAG raw_data_injector
   become: true
   copy:
-    src: "{{ airflow_python_raw_data_injector_methods_script_name }}"
+    src: "dags/{{ airflow_python_raw_data_injector_methods_script_name }}"
     dest: "{{ aura_airflow_script_location }}/{{ airflow_python_raw_data_injector_methods_script_name }}"
     mode: 0644
 
 - name: Copy python file with methods to launch DAG energy_data_injector
   become: true
   copy:
-    src: "{{ airflow_python_energy_injector_methods_script_name }}"
+    src: "dags/{{ airflow_python_energy_injector_methods_script_name }}"
     dest: "{{ aura_airflow_script_location }}/{{ airflow_python_energy_injector_methods_script_name }}"
     mode: 0644
 
 - name: Copy raw_data_injector DAG script
   become: true
   copy:
-    src: "{{ airflow_python_raw_data_dag_name }}"
+    src: "dags/{{ airflow_python_raw_data_dag_name }}"
     dest: "{{ aura_airflow_script_location }}/{{ airflow_python_raw_data_dag_name }}"
     mode: 0644
 
 - name: Copy energy_data_injector DAG script
   become: true
   copy:
-    src: "{{ airflow_python_energy_dag_name }}"
+    src: "dags/{{ airflow_python_energy_dag_name }}"
     dest: "{{ aura_airflow_script_location }}/{{ airflow_python_energy_dag_name }}"
     mode: 0644
 
-- name: launch Airflow Scheduler in daemon process
+- name: Copy energy_data_injector DAG script
   become: true
-  command: docker exec airflow airflow scheduler -D
+  copy:
+    src: "dags/tuto.py"
+    dest: "{{ aura_airflow_script_location }}/tuto.py"
+    mode: 0644
+
+#- name: Delete Airflow container
+#  become: true
+#  docker_service:
+#    project_src: "{{ aura_airflow_root_location }}"
+#    state: absent
+
+- name: Launch Airflow container with LocalExecutor
+  become: true
+  docker_service:
+    project_src: "{{ aura_airflow_root_location }}"
+    project_name: Airflow_LocalExecutor
+    state: present
+  register: output

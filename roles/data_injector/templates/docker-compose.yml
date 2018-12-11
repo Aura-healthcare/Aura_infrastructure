@@ -1,0 +1,34 @@
+version: '2.1'
+services:
+    postgres:
+        image: postgres:9.6
+        environment:
+            - POSTGRES_USER=airflow
+            - POSTGRES_PASSWORD=airflow
+            - POSTGRES_DB=airflow
+
+    webserver:
+        image: puckel/docker-airflow:1.10.1
+        restart: always
+        depends_on:
+            - postgres
+        environment:
+            - LOAD_EX=n
+            - EXECUTOR=Local
+            - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=False
+        volumes:
+            - "./dags:/usr/local/airflow/dags"
+            - "./requirements/requirements.txt:/requirements.txt"
+            - "{{ aura_airflow_data_input_location }}:{{ airflow_data_input_location_in_container }}:rw"
+            - "{{ aura_airflow_data_output_success_location }}:{{ airflow_data_output_success_location_in_container }}:rw"
+            - "{{ aura_airflow_data_output_failed_location }}:{{ airflow_data_output_failed_location_in_container }}:rw"
+            # Uncomment to include custom plugins
+            # - ./plugins:/usr/local/airflow/plugins
+        ports:
+            - "8081:8080"
+        command: webserver
+        healthcheck:
+            test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+            interval: 30s
+            timeout: 30s
+            retries: 3
