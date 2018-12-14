@@ -39,6 +39,7 @@ DF_CLIENT = DataFrameClient(host=HOST, port=PORT, username=USER, password=PASSWO
 print("[Client created]")
 
 user_list = get_user_list(CLIENT)
+print("Users : " + str(user_list))
 
 airflow_config = config["Airflow"]
 default_args = {

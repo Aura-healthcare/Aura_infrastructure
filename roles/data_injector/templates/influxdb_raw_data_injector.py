@@ -12,6 +12,7 @@ from influxdb import InfluxDBClient
 from influxdb import DataFrameClient
 import pandas as pd
 import numpy as np
+import math
 
 # JSON field values
 TYPE_PARAM_NAME = "type"
@@ -394,8 +395,13 @@ def execute_rri_files_write_pipeline(path_to_read_directory, path_for_written_fi
 
         # write to InfluxDB
         try:
-            df_client.write_points(concatenated_dataframe, measurement="RrInterval", tags=tags,
-                                   protocol="json")
+            # Chunk dataframe for time series db performance issues
+            chunk_nb = math.ceil(len(concatenated_dataframe) / 5000)
+            print("CHUNK NB : {}".format(chunk_nb))
+            dataframe_chunk_list = np.array_split(concatenated_dataframe, chunk_nb)
+            # Write each chunk in time series db
+            for chunk in dataframe_chunk_list:
+                df_client.write_points(chunk, measurement="RrInterval", tags=tags, protocol="json")
         except:
             print("Impossible to write file to influxDB")
             write_success = False
