@@ -6,10 +6,10 @@ services:
             - POSTGRES_USER=airflow
             - POSTGRES_PASSWORD=airflow
             - POSTGRES_DB=airflow
-
     webserver:
         image: puckel/docker-airflow:1.10.1
         restart: always
+        #name: {{  }}
         depends_on:
             - postgres
         environment:
@@ -32,7 +32,6 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
-
 networks:
   default:
     external:
