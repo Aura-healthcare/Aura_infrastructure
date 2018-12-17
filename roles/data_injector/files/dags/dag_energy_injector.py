@@ -40,6 +40,7 @@ print("[Client created]")
 
 ACCELEROMETER_MEASUREMENT_NAME = "MotionAccelerometer"
 user_list = get_user_list(CLIENT, measurement=ACCELEROMETER_MEASUREMENT_NAME)
+print("There are {} users with Accelerometer Data.".format(len(user_list)))
 
 airflow_config = config["Airflow"]
 default_args = {

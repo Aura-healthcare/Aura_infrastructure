@@ -32,5 +32,5 @@
         host_gen_cert: true
       airflow:
         host: "scheduler.{{ domain }}"
-        dest: "http://airflow_localexecutor_webserver_1:8080"
+        dest: "http://{{ aura_scheduler_webserver_container }}:8080"
         host_gen_cert: true

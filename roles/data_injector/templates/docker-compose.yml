@@ -2,14 +2,15 @@ version: '2.1'
 services:
     postgres:
         image: postgres:9.6
+        container_name: "{{ aura_db_webserver_container }}"
         environment:
             - POSTGRES_USER=airflow
             - POSTGRES_PASSWORD=airflow
             - POSTGRES_DB=airflow
     webserver:
         image: puckel/docker-airflow:1.10.1
+        container_name: "{{ aura_scheduler_webserver_container }}"
         restart: always
-        #name: {{  }}
         depends_on:
             - postgres
         environment:

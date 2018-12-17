@@ -44,7 +44,7 @@ airflow_config = config["Airflow"]
 default_args = {
     'owner': airflow_config["owner"],
     'depends_on_past': False,
-    'start_date': datetime(2018, 11, 11, 12, 30),
+    'start_date': datetime(2018, 12, 7, 12, 30),
     'email': airflow_config["email"],
     'email_on_failure': True,
     'email_on_retry': False,

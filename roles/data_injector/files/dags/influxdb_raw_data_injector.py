@@ -13,6 +13,7 @@ from influxdb import InfluxDBClient
 from influxdb import DataFrameClient
 import pandas as pd
 import numpy as np
+import math
 
 # JSON field values
 TYPE_PARAM_NAME = "type"

@@ -63,13 +63,6 @@
     dest: "{{ aura_airflow_script_location }}/{{ airflow_python_energy_dag_name }}"
     mode: 0644
 
-- name: Copy energy_data_injector DAG script
-  become: true
-  copy:
-    src: "dags/tuto.py"
-    dest: "{{ aura_airflow_script_location }}/tuto.py"
-    mode: 0644
-
 #- name: Delete Airflow container
 #  become: true
 #  docker_service:
