@@ -2182,7 +2182,7 @@
     "list": []
   },
   "time": {
-    "from": "now-100d",
+    "from": "now-30d",
     "to": "now"
   },
   "timepicker": {
