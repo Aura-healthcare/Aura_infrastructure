@@ -13,14 +13,13 @@ from influxdb import InfluxDBClient
 from influxdb import DataFrameClient
 import pandas as pd
 import numpy as np
-import math
 
 # JSON field values
 TYPE_PARAM_NAME = "type"
 USER_PARAM_NAME = "user"
 DEVICE_PARAM_NAME = "device_address"
 
-# ---------------- JSON TO DATAFRAME CONVERSION ---------------- #
+# ---------------- JSON TO DATAFRAME CONVERSION METHODS ---------------- #
 
 
 def convert_acm_json_to_df(acm_json: dict) -> pd.DataFrame:
@@ -98,8 +97,7 @@ def convert_gyro_json_to_df(gyro_json) -> pd.DataFrame:
     return df_to_write
 
 
-# ---------------- PROCESSING FILES ---------------- #
-
+# ---------------- OTHER METHODS ---------------- #
 
 def create_df_with_unique_index(data_to_write: pd.DataFrame,
                                 time_delta_to_add: int = 123456) -> pd.DataFrame:
@@ -127,91 +125,13 @@ def create_df_with_unique_index(data_to_write: pd.DataFrame,
     return data_to_write
 
 
-def write_file_to_influxdb(file: str, path_to_files: str, df_client) -> bool:
-    """
-    Function writing JSON file to influxDB.
-
-    Arguments
-    ---------
-    file - JSON file to convert and write to InfluxDB
-    path_to_data_test_directory - path for reading the JSON file
-    get_tmstp - Option to extract all the timestamps of the JSON file
-
-    Returns
-    ---------
-    write_success (Boolean) - Result of the write process
-    """
-    write_success = True
-
-    # Open Json file
-    try:
-        with open(path_to_files + file) as json_file:
-            json_data = json.load(json_file)
-        # Get tags from file
-        measurement = json_data[TYPE_PARAM_NAME]
-        tags = {USER_PARAM_NAME: json_data[USER_PARAM_NAME],
-                DEVICE_PARAM_NAME: json_data[DEVICE_PARAM_NAME]}
-    except:
-        print("Impossible to open file.")
-        write_success = False
-        return write_success
-
-    try:
-        # Convert json to pandas Dataframe
-        if measurement == "MotionAccelerometer":
-            data_to_write = convert_acm_json_to_df(json_data)
-        else:
-            data_to_write = convert_gyro_json_to_df(json_data)
-    except:
-        print("Impossible to convert file to Dataframe.")
-        write_success = False
-        return write_success
-
-    # Checking if index of data is unique to avoid overwritten points in InfluxDB
-    is_index_unique = data_to_write.index.is_unique
-    if not is_index_unique:
-        data_to_write = create_df_with_unique_index(data_to_write)
-
-    # write to InfluxDB
-    try:
-        df_client.write_points(data_to_write, measurement=measurement, tags=tags, protocol="json")
-    except:
-        print("Impossible to write file to influxDB")
-        write_success = False
-
-    return write_success
-
-
-def move_processed_file(file: str, write_success: bool, path_to_read_directory: str,
-                        path_for_written_files: str, path_for_problem_files: str):
-    """
-    Function dealing with the JSON file once it is processed.
-
-    Arguments
-    ---------
-    file - JSON file processed
-    write_success - result of the writing process to influxDB
-    path_to_read_directory - directory path where are JSON files
-    path_for_written_files - directory where files writen in influxDB are moved
-    path_for_problem_files - directory where files not correctly writen in influxDB are moved
-
-    """
-    if write_success:
-        # move file when write is done in influxdb
-        shutil.move(src=path_to_read_directory + file,
-                    dst=path_for_written_files + file)
-    else:
-        shutil.move(src=path_to_read_directory + file,
-                    dst=path_for_problem_files + file)
-
-
 def create_files_by_user_dict(files_list: list) -> dict:
     """
     Create a dictionary containing the corresponding list of RR-inteval files for each user.
 
     Arguments
     ---------
-    files_list - list of files to sort
+    files_list - list of files, must be sorted for function to operate correctly !
 
     Returns
     ---------
@@ -240,13 +160,47 @@ def create_files_by_user_dict(files_list: list) -> dict:
             file_list_for_a_user.append(filename)
         else:
             files_by_user_dict[current_user] = file_list_for_a_user
-            current_user = filename.split("_")[0]
+            current_user = filename.split("/")[-1].split("_")[0]
             file_list_for_a_user = [filename]
 
     # Add list of files for last user in dictionary
     files_by_user_dict[current_user] = file_list_for_a_user
     return files_by_user_dict
 
+
+def launch_retroactive_influxdb_cq(client, user, measurement, first_timestamp):
+    """
+
+    :param client:
+    :param user:
+    :param measurement:
+    :param first_timestamp:
+    :return:
+    """
+    # Create Unix timestamp for retroactive query
+    unix_timestamp_for_query = datetime.datetime(*first_timestamp.timetuple()[:3]).strftime("%s") + "000ms"
+
+    # Create retroactive continuous queries if data has been ingested for more than 1d
+    if measurement == "MotionAccelerometer":
+        retroactive_continuous_query = "SELECT count(\"x_acm\") INTO \"x_acm_count_by_day\" FROM {} WHERE \"user\" = '{}' and time >= {} GROUP BY time(1d), \"user\"".format(measurement, user, unix_timestamp_for_query)
+        client.query(retroactive_continuous_query)
+        retroactive_continuous_query = "SELECT count(\"y_acm\") INTO \"y_acm_count_by_day\" FROM {} WHERE \"user\" = '{}' and time >= {} GROUP BY time(1d), \"user\"".format(measurement, user, unix_timestamp_for_query)
+        client.query(retroactive_continuous_query)
+        retroactive_continuous_query = "SELECT count(\"z_acm\") INTO \"z_acm_count_by_day\" FROM {} WHERE \"user\" = '{}' and time >= {} GROUP BY time(1d), \"user\"".format(measurement, user, unix_timestamp_for_query)
+        client.query(retroactive_continuous_query)
+    elif measurement == "MotionGyroscope":
+        retroactive_continuous_query = "SELECT count(\"x_gyro\") INTO \"x_gyro_count_by_day\" FROM {} WHERE \"user\" = '{}' and time >= {} GROUP BY time(1d), \"user\"".format(measurement, user, unix_timestamp_for_query)
+        client.query(retroactive_continuous_query)
+        retroactive_continuous_query = "SELECT count(\"y_gyro\") INTO \"y_gyro_count_by_day\" FROM {} WHERE \"user\" = '{}' and time >= {} GROUP BY time(1d), \"user\"".format(measurement, user, unix_timestamp_for_query)
+        client.query(retroactive_continuous_query)
+        retroactive_continuous_query = "SELECT count(\"z_gyro\") INTO \"z_gyro_count_by_day\" FROM {} WHERE \"user\" = '{}' and time >= {} GROUP BY time(1d), \"user\"".format(measurement, user, unix_timestamp_for_query)
+        client.query(retroactive_continuous_query)
+    else:
+        retroactive_continuous_query = "SELECT count(\"RrInterval\") INTO \"rri_count_by_day\" FROM {} WHERE \"user\" = '{}' and time >= {} GROUP BY time(1d), \"user\"".format(measurement, user, unix_timestamp_for_query)
+        client.query(retroactive_continuous_query)
+
+
+# ---------------- RR-INTERVAL FILES PROCESSING METHODS ---------------- #
 
 def concat_rrinterval_files_into_single_dataframe(files_list: list) -> pd.DataFrame:
     """
@@ -337,89 +291,65 @@ def get_next_timestamp(next_timestamp, current_timestamp, last_corrected_timesta
         return next_timestamp
 
 
-def execute_rri_files_write_pipeline(path_to_read_directory: str, path_for_written_files: str,
-                                     path_for_problems_files: str, df_client, verbose: bool = False):
+# ---------------- WRITE PIPELINE METHODS ---------------- #
+
+def write_file_to_influxdb(file: str, path_to_files: str, df_client) -> bool:
     """
-    Process all files in the read directory to write them to influxDB.
+    Function writing JSON file to influxDB.
 
     Arguments
     ---------
-    path_to_read_directory - path from which we read JSON files to write into influxDB.
-    path_for_written_files - path where we move correctly written files.
-    path_for_problems_files - path where we move files for which write proccess failed.
-    df_client - Dataframe InfluxDB Client
-    verbose - Option to print some logs informations about process.
+    file - JSON file to convert and write to InfluxDB
+    path_to_data_test_directory - path for reading the JSON file
+    get_tmstp - Option to extract all the timestamps of the JSON file
+
+    Returns
+    ---------
+    write_success (Boolean) - Result of the write process
     """
-    # Get files list containing RR-Interval in directory
-    rri_files_list = glob.glob(path_to_read_directory + "*RrInterval*")
-    rri_files_list.sort()
-    if verbose:
-        print("There are currently {} files.".format(len(rri_files_list)))
+    write_success = True
 
-    # group and sort files by user
-    sorted_rri_files_dict = create_files_by_user_dict(rri_files_list)
+    # Open Json file
+    try:
+        with open(path_to_files + file) as json_file:
+            json_data = json.load(json_file)
+        # Get tags from file
+        measurement = json_data[TYPE_PARAM_NAME]
+        tags = {USER_PARAM_NAME: json_data[USER_PARAM_NAME],
+                DEVICE_PARAM_NAME: json_data[DEVICE_PARAM_NAME]}
+    except:
+        print("Impossible to open file.")
+        write_success = False
+        return write_success
 
-    # Creating directory for processed file
-    # ---------- DELETE IN PRODUCTION MODE ---------- #
-    if not os.path.exists(path_for_written_files):
-        os.makedirs(path_for_written_files)
-    if not os.path.exists(path_for_problems_files):
-        os.makedirs(path_for_problems_files)
+    try:
+        # Convert json to pandas Dataframe
+        if measurement == "MotionAccelerometer":
+            data_to_write = convert_acm_json_to_df(json_data)
+        else:
+            data_to_write = convert_gyro_json_to_df(json_data)
+    except:
+        print("Impossible to convert file to Dataframe.")
+        write_success = False
+        return write_success
 
-    for user in sorted_rri_files_dict.keys():
-        write_success = True
+    # Checking if index of data is unique to avoid overwritten points in InfluxDB
+    is_index_unique = data_to_write.index.is_unique
+    if not is_index_unique:
+        data_to_write = create_df_with_unique_index(data_to_write)
 
-        user_rri_files = sorted_rri_files_dict[user]
+    # write to InfluxDB
+    try:
+        df_client.write_points(data_to_write, measurement=measurement, tags=tags, protocol="json")
+    except:
+        print("Impossible to write file to influxDB")
+        write_success = False
 
-        # concat multiple files of each user
-        concatenated_dataframe = concat_rrinterval_files_into_single_dataframe(files_list=user_rri_files)
-
-        # GET raw data count by min
-        rri_count_by_min = concatenated_dataframe.resample("1min", label="right").count()
-        rri_count_by_min.columns = ["rr_interval_count_by_min"]
-
-        # Create new timestamp
-        corrected_timestamp_list = create_corrected_timestamp_list(concatenated_dataframe)
-        concatenated_dataframe.index = corrected_timestamp_list
-        concatenated_dataframe.index.names = ["timestamp"]
-
-        # Open Json file
-        try:
-            with open(user_rri_files[0]) as json_file:
-                json_data = json.load(json_file)
-            tags = {USER_PARAM_NAME: json_data[USER_PARAM_NAME],
-                    DEVICE_PARAM_NAME: json_data[DEVICE_PARAM_NAME]}
-        except:
-            print("Impossible to open file.")
-            write_success = False
-
-        # write raw RR-interval count by min to InfluxDB
-        try:
-            chunk_and_write_dataframe(rri_count_by_min, measurement="RrInterval", tags=tags,
-                                      user_id=user, df_client=df_client, batch_size=5000)
-        except:
-            print("Impossible to write RR-interval raw data count by min to influxDB.")
-
-        print("DF SHAPE : {}".format(concatenated_dataframe.shape))
-        # write processed rr_interval data to InfluxDB
-        try:
-            chunk_and_write_dataframe(concatenated_dataframe, measurement="RrInterval",
-                                      user_id=user, df_client=df_client, batch_size=5000)
-        except:
-            print("Impossible to write file to influxDB")
-            write_success = False
-
-        for json_file in user_rri_files:
-            move_processed_file(json_file.split("/")[-1], write_success, path_to_read_directory,
-                                path_for_written_files, path_for_problems_files)
-            if verbose:
-                file_processed_timestamp = str(datetime.datetime.now())
-                log = "[" + file_processed_timestamp + "]" + " : " + json_file + " processed"
-                print(log)
+    return write_success
 
 
 def chunk_and_write_dataframe(dataframe_to_write: pd.DataFrame, measurement: str,
-                              user_id: str, df_client, batch_size: int = 5000) -> bool:
+                              tags: dict, df_client, batch_size: int = 5000) -> bool:
     """
 
     :param dataframe_to_write:
@@ -436,28 +366,141 @@ def chunk_and_write_dataframe(dataframe_to_write: pd.DataFrame, measurement: str
     dataframe_chunk_list = np.array_split(dataframe_to_write, chunk_nb)
     # Write each chunk in time series db
     for chunk in dataframe_chunk_list:
-        tags = {USER_PARAM_NAME: user_id}
         df_client.write_points(chunk, measurement=measurement, tags=tags, protocol="json")
     return True
 
 
-def execute_acm_gyro_files_write_pipeline(path_to_read_directory: str, path_for_written_files: str,
-                                          path_for_problems_files: str, df_client, verbose=False):
+def move_processed_file(file: str, write_success: bool, path_to_read_directory: str,
+                        path_for_written_files: str, path_for_problem_files: str):
+    """
+    Function dealing with the JSON file once it is processed.
+
+    Arguments
+    ---------
+    file - JSON file processed
+    write_success - result of the writing process to influxDB
+    path_to_read_directory - directory path where are JSON files
+    path_for_written_files - directory where files writen in influxDB are moved
+    path_for_problem_files - directory where files not correctly writen in influxDB are moved
+
+    """
+    if write_success:
+        # move file when write is done in influxdb
+        shutil.move(src=path_to_read_directory + file,
+                    dst=path_for_written_files + file)
+    else:
+        shutil.move(src=path_to_read_directory + file,
+                    dst=path_for_problem_files + file)
+
+
+def rri_files_write_pipeline(user_rri_files: list, df_client, path_to_read_directory: str,
+                             path_for_written_files: str, path_for_problems_files: str,
+                             verbose: bool = True):
+    """
+
+    :param user:
+    :param user_rri_files:
+    :param df_client:
+    :param path_to_read_directory:
+    :param path_for_written_files:
+    :param path_for_problems_files:
+    :param verbose:
+    :return:
+    """
+    # concat multiple files of each user
+    concatenated_dataframe = concat_rrinterval_files_into_single_dataframe(files_list=user_rri_files)
+
+    # GET raw data count by min
+    rri_count_by_min = concatenated_dataframe.resample("1min", label="right").count()
+    rri_count_by_min.columns = ["rr_interval_count_by_min"]
+
+    # Create new timestamp
+    corrected_timestamp_list = create_corrected_timestamp_list(concatenated_dataframe)
+    concatenated_dataframe.index = corrected_timestamp_list
+    concatenated_dataframe.index.names = ["timestamp"]
+
+    # Open Json file
+    try:
+        with open(user_rri_files[0]) as json_file:
+            json_data = json.load(json_file)
+        tags = {USER_PARAM_NAME: json_data[USER_PARAM_NAME],
+                DEVICE_PARAM_NAME: json_data[DEVICE_PARAM_NAME]}
+    except:
+        print("Impossible to open file.")
+        write_success = False
+
+    # write raw RR-interval count by min to InfluxDB
+    try:
+        chunk_and_write_dataframe(rri_count_by_min, measurement="RrInterval",
+                                  tags=tags, df_client=df_client, batch_size=5000)
+    except:
+        print("Impossible to write RR-interval raw data count by min to influxDB.")
+
+    print("DF SHAPE : {}".format(concatenated_dataframe.shape))
+    # write processed rr_interval data to InfluxDB
+    try:
+        chunk_and_write_dataframe(concatenated_dataframe, measurement="RrInterval",
+                                  tags=tags, df_client=df_client, batch_size=5000)
+        write_success = True
+    except:
+        print("Impossible to write file to influxDB")
+        write_success = False
+
+    for json_file in user_rri_files:
+        move_processed_file(json_file.split("/")[-1], write_success, path_to_read_directory,
+                            path_for_written_files, path_for_problems_files)
+        if verbose:
+            file_processed_timestamp = str(datetime.datetime.now())
+            log = "[" + file_processed_timestamp + "]" + " : " + json_file + " processed"
+            print(log)
+
+
+def acm_gyro_write_pipeline(user_acm_files: list, df_client, path_to_read_directory: str,
+                            path_for_written_files: str, path_for_problems_files: str,
+                            verbose: bool = True):
+    """
+
+    :param user_acm_files:
+    :param df_client:
+    :param path_to_read_directory:
+    :param path_for_written_files:
+    :param path_for_problems_files:
+    :param verbose:
+    :return:
+    """
+    for json_file in user_acm_files:
+        write_success = write_file_to_influxdb(json_file.split("/")[-1], path_to_read_directory, df_client)
+        move_processed_file(json_file.split("/")[-1], write_success, path_to_read_directory,
+                            path_for_written_files, path_for_problems_files)
+        if verbose:
+            file_processed_timestamp = str(datetime.datetime.now())
+            log = "[" + file_processed_timestamp + "] " + json_file + " file processed with success : {}".format(write_success)
+            print(log)
+
+
+def execute_write_pipeline(measurement: str, path_to_read_directory: str, path_for_written_files: str,
+                           path_for_problems_files: str, client, df_client, verbose: bool = True):
     """
     Process all gyroscope and accelerometer files in the read directory to write them to influxDB.
 
     Arguments
     ---------
+    measurement - Measurement name for pipeline execution.
     path_to_read_directory - path from which we read JSON files to write into influxDB.
     path_for_written_files - path where we move correctly written files.
     path_for_problems_files - path where we move files for which write proccess failed.
     df_client - Dataframe InfluxDB Client
     verbose - Option to print some logs informations about process.
     """
-    # List files to process
-    list_files = os.listdir(path_to_read_directory)
+
+    # Get files list containing specified measurement data in directory
+    files_list = glob.glob(path_to_read_directory + "*" + measurement + "*")
+    files_list.sort()
     if verbose:
-        print("There are currently {} files.".format(len(list_files)))
+        print("There are currently {} {} files to process.".format(len(files_list), measurement))
+
+    # group and sort files by user
+    sorted_files_dict = create_files_by_user_dict(files_list)
 
     # Creating directory for processed files
     # ---------- DELETE IN PRODUCTION MODE ---------- #
@@ -466,17 +509,27 @@ def execute_acm_gyro_files_write_pipeline(path_to_read_directory: str, path_for_
     if not os.path.exists(path_for_problems_files):
         os.makedirs(path_for_problems_files)
 
-    # Processing & writing files to influx and cleaning directory
-    list_files_generator = (file for file in list_files)
-    for json_file in list_files_generator:
-        is_writen = write_file_to_influxdb(json_file, path_to_read_directory, df_client)
-        move_processed_file(json_file, is_writen, path_to_read_directory, path_for_written_files,
-                            path_for_problems_files)
+    for user in sorted_files_dict.keys():
+        print()
+        print("{} data ingestor for user {}".format(measurement, user))
+        user_acm_files = sorted_files_dict[user]
 
-        if verbose:
-            file_processed_timestamp = str(datetime.datetime.now())
-            log = "[" + file_processed_timestamp + "]" + " : " + json_file + " processed"
-            print(log)
+        if measurement == "RrInterval":
+            rri_files_write_pipeline(user_acm_files, df_client, path_to_read_directory,
+                                     path_for_written_files, path_for_problems_files, verbose)
+        else:
+            acm_gyro_write_pipeline(user_acm_files, df_client, path_to_read_directory,
+                                    path_for_written_files, path_for_problems_files, verbose)
+
+        # Get first timestamp to raise Flag to do retroactive CQ if necessary
+        first_file_timestamp_for_user = pd.to_datetime(user_acm_files[0].split("_")[-1].split("T")[0])
+        days_difference = (datetime.datetime.now() - first_file_timestamp_for_user).days
+
+        if days_difference > 0:
+            launch_retroactive_influxdb_cq(client, user, measurement, first_file_timestamp_for_user)
+            print("Retroactive {} Continuous Queries executed with success for user {}.".format(measurement, user))
+        else:
+            print("No need to launch Retroactive continuous query because there are only today's data.")
 
 
 if __name__ == "__main__":
@@ -505,11 +558,10 @@ if __name__ == "__main__":
     print("[Creation Client Success]")
 
     # Create database
-    # CLIENT.create_database(DB_NAME)
+    CLIENT.create_database(DB_NAME)
 
     # -------- Write pipeline -------- #
-    execute_rri_files_write_pipeline(PATH_TO_READ_DIRECTORY, PATH_FOR_WRITTEN_FILES,
-                                     PATH_FOR_PROBLEMS_FILES, DF_CLIENT, True)
-
-    execute_acm_gyro_files_write_pipeline(PATH_TO_READ_DIRECTORY, PATH_FOR_WRITTEN_FILES,
-                                          PATH_FOR_PROBLEMS_FILES, DF_CLIENT, True)
+    for measurement in ["RrInterval", "MotionAccelerometer", "MotionGyroscope"]:
+        execute_write_pipeline(measurement, PATH_TO_READ_DIRECTORY, PATH_FOR_WRITTEN_FILES,
+                               PATH_FOR_PROBLEMS_FILES, CLIENT, DF_CLIENT, True)
+        print("-----------------------")

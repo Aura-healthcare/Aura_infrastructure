@@ -1,9 +1,21 @@
 #!/usr/bin/env python
 # coding: utf-8
-"""This script defines methods to compute features from InfluxDB Data"""
+"""
+This script defines methods to compute features from InfluxDB Data
 
-from typing import List
+# 1. Compute global time interval
+# 2. Slice this global interval in as many 1 day intervals (from 00:00 to 23:59) as necessary
+    #for each of those intervals:
+        # 3. Query raw Accelerometer data from time series db
+        # 4. Compute the energy feature
+        # 5. Chunk resulting energy dataframe (if necessary, for performance issues)
+        # 6. Write energy created
+"""
+
+from datetime import timedelta
+import pytz
 import math
+from typing import List
 import datetime
 import configparser
 import numpy as np
@@ -58,10 +70,11 @@ def extract_raw_data_from_influxdb(client, measurement: str, user_id: str, start
     :return extracted_result_set: influxDB object containing extracted data
     """
     # Extract raw data from InfluxDB for D-day
-    query = "SELECT * FROM {} WHERE \"user\" = '{}' and time > now() - {} and time < now() - {}".format(measurement,
-                                                                                                        user_id,
-                                                                                                        start_time,
-                                                                                                        end_time)
+    query = "SELECT * FROM {} WHERE \"user\" = '{}' and time > {} and time < {}".format(measurement,
+                                                                                        user_id,
+                                                                                        start_time,
+                                                                                        end_time)
+    print(query)
     extracted_result_set = client.query(query)
     return extracted_result_set
 
@@ -73,7 +86,7 @@ def get_first_timestamp_to_compute_energy(user_id: str, client):
     """
     Retruns the first timestamp from which whe need to compute the energy.
 
-    :param user_id: if of user
+    :param user_id: id of user
     :param client: influxdb client
     :return first_timestamp_to_compute_energy: timestamp
     """
@@ -84,6 +97,7 @@ def get_first_timestamp_to_compute_energy(user_id: str, client):
     if last_energy_timestamp_for_user:
         # Get last timestamp of energy data for user
         first_timestamp_to_compute_energy = last_energy_timestamp_for_user[0]["time"]
+        print("####### {} #######".format(pd.to_datetime(first_timestamp_to_compute_energy).tz_localize('Europe/Paris')))
         print("Last energy timestamp in time series db: {}".format(first_timestamp_to_compute_energy))
     else:
         # Get first timestamp of Accelerometer data for user
@@ -95,7 +109,7 @@ def get_first_timestamp_to_compute_energy(user_id: str, client):
             first_acm_timestamp_for_user = list(extracted_data_result_set.get_points())
             first_timestamp_to_compute_energy = first_acm_timestamp_for_user[0]["time"]
 
-    first_timestamp_to_compute_energy = pd.to_datetime(first_timestamp_to_compute_energy, unit="ns")
+    first_timestamp_to_compute_energy = pd.to_datetime(first_timestamp_to_compute_energy, unit="ns").tz_localize('UTC')
     return first_timestamp_to_compute_energy
 
 
@@ -106,7 +120,7 @@ def get_time_difference_between_now_and_timestamp(timestamp):
     :param timestamp: input timestamp
     :return days_time_delta: time difference with current time in days
     """
-    current_timestamp = datetime.datetime.now()
+    current_timestamp = datetime.datetime.now(pytz.timezone("UTC"))
     time_delta = current_timestamp - timestamp
 
     days_time_delta = time_delta.days
@@ -120,9 +134,9 @@ def transform_acm_result_set_into_dataframe(result_set: str, tags: dict) -> pd.D
     """
     Returns extracted accelerometer data from influxDB ResulSet object.
 
-    :param result_set:
-    :param tags:
-    :return:
+    :param result_set: InfluxDB Object containing raw data from query
+    :param tags: influxdb tags from which to extract data. See influxdb python API for more informations.
+    :return raw_acm_dataframe: pandas Dataframe containing Accelerometer Data.
     """
     raw_acm_data_list = list(result_set.get_points(measurement=ACCELEROMETER_MEASUREMENT_NAME, tags=tags))
     raw_acm_dataframe = pd.DataFrame(raw_acm_data_list)[["time", "x_acm", "y_acm", "z_acm"]]
@@ -169,9 +183,9 @@ def chunk_and_write_dataframe(dataframe_to_write: pd.DataFrame, measurement: str
     """
     Split the input dataframe in chunk and write them sequentially for perfomance issues
 
-    :param dataframe_to_write:
-    :param measurement:
-    :param user_id:
+    :param dataframe_to_write: pandas dataframe to write in influxDB
+    :param measurement: measurement name of dataframe to write
+    :param user_id: id of user
     :return:
     """
     # Chunk dataframe for time series db performance issues
@@ -185,19 +199,85 @@ def chunk_and_write_dataframe(dataframe_to_write: pd.DataFrame, measurement: str
     return True
 
 
+def get_timestamps_for_query(day):
+    """
+    TODO
+
+    :param day:
+    :return:
+    """
+    current_timestamp = datetime.datetime.now(pytz.timezone("UTC"))
+    start = datetime.datetime(*current_timestamp.timetuple()[:3]) - timedelta(days=day)
+    end = start + timedelta(days=1)
+    start = start.strftime("%s") + "000ms"
+    end = end.strftime("%s") + "000ms"
+    return start, end
+
+
 def create_and_write_energy_for_user(user_id: str, client, df_client, accelerometer_measurement_name: str,
                                      five_sec_threshold: int, one_min_threshold: int, max_successive_time_diff: str,
                                      batch_size=5000):
+    """
+    Creates energy for user and write it in influxDB. It begins by extracting raw data from influxDB, process it
+    to create the energy feature and then write batch of resulting feature data in influxDB.
+
+    :param user_id: id of user
+    :param client: influxdb client
+    :param df_client: influxdb dataframe client
+    :param accelerometer_measurement_name: measurement name of dataframe to write
+    :param five_sec_threshold: threshold from which we consider that there are enough points to create energy \
+    feature for each 5 seconds intervals.
+    :param one_min_threshold: threshold from which we consider that there are enough points to create energy \
+    feature for each one minute intervals.
+    :param max_successive_time_diff:
+    :param batch_size: number of points to set for each batch to write in influxDB. It splits pandas dataframe \
+    in multiple dataframe of "batch_size" size, and write them sequentially for performance issues.
+    :return:
+    """
     print("-----------------------")
     print("[Creation of features] user {}".format(user_id))
 
     # # 1. Compute global time interval
     first_timestamp_to_compute_energy = get_first_timestamp_to_compute_energy(user_id, client=client)
+    print("FIRST : {}".format(first_timestamp_to_compute_energy))
     day_range_to_query = get_time_difference_between_now_and_timestamp(first_timestamp_to_compute_energy)
 
-    for day in reversed(range(day_range_to_query + 1)):
+    # # 3. Query raw Accelerometer data from time series db
+    # Extract raw data from InfluxDB for D-day
+    start = first_timestamp_to_compute_energy.strftime("%s") + "000ms"
+    _, end = get_timestamps_for_query(day_range_to_query)
+    extracted_result_set = extract_raw_data_from_influxdb(client, accelerometer_measurement_name,
+                                                          user_id, start, end)
+
+    # Transform InfluxDB ResultSet in pandas Dataframe if resultset is not empty
+    if extracted_result_set:
+        tags = {"user": user_id}
+        raw_acm_dataframe = transform_acm_result_set_into_dataframe(extracted_result_set, tags)
+        print("Raw dataframe shape: {}".format(raw_acm_dataframe.shape))
+
+        # 4. Compute the energy feature
+        five_sec_energy_dataframe = create_energy_dataframe(raw_acm_dataframe,
+                                                            aggregation_count_threshold=five_sec_threshold,
+                                                            max_successive_time_diff=max_successive_time_diff,
+                                                            aggregation_time="5s")
+        if not five_sec_energy_dataframe.empty:
+            # 5. Chunk resulting energy dataframe (if necessary) and write in influxdb
+            chunk_and_write_dataframe(five_sec_energy_dataframe, accelerometer_measurement_name, user_id,
+                                      df_client, batch_size=batch_size)
+
+        # 4-bis. Compute the energy feature
+        one_minute_energy_dataframe = create_energy_dataframe(raw_acm_dataframe,
+                                                              aggregation_count_threshold=one_min_threshold,
+                                                              max_successive_time_diff=max_successive_time_diff,
+                                                              aggregation_time="1min")
+        if not one_minute_energy_dataframe.empty:
+            # 5-bis. Chunk resulting energy dataframe (if necessary) and write in influxdb
+            chunk_and_write_dataframe(one_minute_energy_dataframe, accelerometer_measurement_name, user_id,
+                                      df_client, batch_size=batch_size)
+
+    for day in reversed(range(day_range_to_query)):
         # Extract raw data from InfluxDB for D-day
-        start, end = str(day + 1) + "d", str(day) + "d"
+        start, end = get_timestamps_for_query(day)
         extracted_result_set = extract_raw_data_from_influxdb(client, accelerometer_measurement_name,
                                                               user_id, start, end)
 
@@ -232,7 +312,6 @@ def create_and_write_energy_for_user(user_id: str, client, df_client, accelerome
         print("[Written process done]")
 
 
-
 if __name__ == "__main__":
 
     config = configparser.ConfigParser()
@@ -251,6 +330,7 @@ if __name__ == "__main__":
     FIVE_SEC_THRESHOLD = motion_acm_constants["five_sec_threshold"]
     ONE_MIN_THRESHOLD = motion_acm_constants["one_min_threshold"]
     MAX_SUCCESSIVE_TIME_DIFF = motion_acm_constants["max_successive_time_diff"]
+    ACCELEROMETER_MEASUREMENT_NAME = motion_acm_constants["measurement_name"]
 
     # see InfluxDB Python API for more information
     # https://influxdb-python.readthedocs.io/en/latest/api-documentation.html
