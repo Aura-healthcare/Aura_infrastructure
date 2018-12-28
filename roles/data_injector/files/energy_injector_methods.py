@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # coding: utf-8
 """
-This script defines methods to compute features from InfluxDB Data
+This script defines methods to compute energy features from InfluxDB Data
 
 # 1. Compute global time interval
 # 2. Slice this global interval in as many 1 day intervals (from 00:00 to 23:59) as necessary
-    #for each of those intervals:
+    # for each of those intervals :
         # 3. Query raw Accelerometer data from time series db
         # 4. Compute the energy feature
         # 5. Chunk resulting energy dataframe if necessary
-        # 6. Write energy created
+        # 6. Write energy into time series db
 """
 
 from datetime import timedelta

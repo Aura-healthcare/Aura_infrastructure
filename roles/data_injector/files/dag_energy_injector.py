@@ -57,7 +57,7 @@ default_args = {
     # 'end_date': datetime(2016, 1, 1),
 }
 
-dag = DAG('energy_data_injector', catchup=False, default_args=default_args, schedule_interval="@daily")
+energy_dag = DAG('energy_data_injector', catchup=False, default_args=default_args, schedule_interval="@daily")
 
 write_energy_data = PythonOperator(task_id='create_and_write_energy_for_users',
                                    python_callable=create_and_write_energy_for_users,
@@ -70,6 +70,6 @@ write_energy_data = PythonOperator(task_id='create_and_write_energy_for_users',
                                               "max_successive_time_diff": MAX_SUCCESSIVE_TIME_DIFF,
                                               "batch_size": 5000
                                               },
-                                   dag=dag)
+                                   dag=energy_dag)
 
 write_energy_data
