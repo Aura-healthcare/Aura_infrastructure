@@ -4,3 +4,4 @@
 secrets.yml
 .vagrant/
 .DS_Store
+.workdir/
