@@ -1,6 +1,6 @@
 ---
 
-websocket_server_container_name: "{{ aura_backend_webserver_container }}"
+websocket_server_container_name: "{{ aura_backend_webserver_container }}"
 
 websocket_server_root_location: "/opt/docker-data/{{ websocket_server_container_name }}"
 websocket_server_conf_location: "{{ websocket_server_root_location }}/conf"

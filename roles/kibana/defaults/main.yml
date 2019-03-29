@@ -1,0 +1,13 @@
+---
+
+kibana_container_name: "kibana"
+
+kibana_root_location: "/opt/docker-data/{{ kibana_container_name }}"
+kibana_conf_location: "{{ kibana_root_location }}/conf"
+kibana_data_location: "{{ kibana_root_location }}/data"
+
+#kibana_docker_networks: "{{ aura_docker_network }}"
+kibana_docker_networks:
+  - name: "{{ aura_docker_network }}"
+
+kibana_container_restart_policy: "always"

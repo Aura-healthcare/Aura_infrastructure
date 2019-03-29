@@ -1,0 +1,5 @@
+---
+
+- name: restart elasticsearch
+  set_fact:
+    elasticsearch_docker_restart: true

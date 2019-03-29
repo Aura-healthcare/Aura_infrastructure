@@ -1,0 +1,13 @@
+---
+
+logspout_container_name: "logspout"
+
+logspout_root_location: "/opt/docker-data/{{ logspout_container_name }}"
+logspout_conf_location: "{{ logspout_root_location }}/conf"
+logspout_data_location: "{{ logspout_root_location }}/data"
+
+#kibana_docker_networks: "{{ aura_docker_network }}"
+logspout_docker_networks:
+  - name: "{{ aura_docker_network }}"
+
+logspout_container_restart_policy: "always"

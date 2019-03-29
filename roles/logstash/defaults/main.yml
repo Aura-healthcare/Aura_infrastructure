@@ -1,0 +1,13 @@
+---
+
+logstash_container_name: "logstash"
+
+logstash_root_location: "/opt/docker-data/{{ logstash_container_name }}"
+logstash_conf_location: "{{ logstash_root_location }}/conf"
+logstash_pipeline_location: "{{ logstash_root_location }}/pipeline"
+
+#logstash_docker_networks: []
+logstash_docker_networks:
+  - name: "{{ aura_docker_network }}"
+
+logstash_container_restart_policy: "always"

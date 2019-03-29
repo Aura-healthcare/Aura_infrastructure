@@ -1,0 +1,22 @@
+---
+
+- meta: flush_handlers
+
+- name: Create a network
+  become: true
+  docker_network:
+    name: "{{ item.name }}"
+  with_items: "{{ logstash_docker_networks }}"
+
+- name: Start or restart logstash container
+  become: true
+  docker_container:
+    name: "{{ logstash_container_name }}"
+    image: logstash:6.6.2
+    state: "{{ logstash_docker_state | default('started') }}"
+    restart: "{{ logstash_docker_restart | default(false) | bool }}"
+    networks: "{{ logstash_docker_networks }}"
+    restart_policy: "{{ logstash_container_restart_policy }}"
+    volumes:
+      - "{{ logstash_conf_location }}/logstash.yml:/usr/share/logstash/config/logstash.yml:ro"
+      - "{{ logstash_pipeline_location }}/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"

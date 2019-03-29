@@ -1,0 +1,28 @@
+
+---
+
+- name: create logstash local directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: true
+  with_items:
+    - "{{ logstash_conf_location }}"
+    - "{{ logstash_pipeline_location }}"
+
+- name: "Create configuration"
+  become: true
+  notify: restart logstash
+  template:
+    src: "logstash.yml.j2"
+    dest: "{{ logstash_conf_location }}/logstash.yml"
+
+- name: "Create pipeline"
+  become: true
+  notify: restart logstash
+  template:
+    src: "logstash.conf.j2"
+    dest: "{{ logstash_pipeline_location }}/logstash.conf"
+
+- include_tasks: run_container.yml

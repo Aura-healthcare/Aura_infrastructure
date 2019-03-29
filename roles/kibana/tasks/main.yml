@@ -1,0 +1,19 @@
+---
+
+- name: create kibana local directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: true
+  with_items:
+    - "{{ kibana_conf_location }}"
+
+- name: "Create configuration"
+  become: true
+  notify: restart kibana
+  template:
+    src: "kibana.yml.j2"
+    dest: "{{ kibana_conf_location }}/kibana.yml"
+
+- include_tasks: run_container.yml

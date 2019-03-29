@@ -30,3 +30,11 @@
         host: "scheduler.{{ domain }}"
         dest: "http://{{ aura_scheduler_container }}:8080"
         host_gen_cert: true
+      kibana:
+        host: "monitoring.{{ domain }}"
+        dest: "http://{{ aura_kibana_container }}:5601"
+        host_gen_cert: true
+      elasticsearch:
+        host: "elasticsearch.{{ domain }}"
+        dest: "http://{{ aura_elasticsearch_container }}:9200"
+        host_gen_cert: true

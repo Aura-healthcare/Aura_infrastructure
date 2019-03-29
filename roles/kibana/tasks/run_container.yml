@@ -1,0 +1,23 @@
+---
+
+- meta: flush_handlers
+
+- name: Create a network
+  become: true
+  docker_network:
+    name: "{{ item.name }}"
+  with_items: "{{ kibana_docker_networks }}"
+
+- name: Start or restart kibana container
+  become: true
+  docker_container:
+    name: "{{ kibana_container_name }}"
+    image: kibana:6.6.2
+    state: "{{ kibana_docker_state | default('started') }}"
+    restart: "{{ kibana_docker_restart | default(false) | bool }}"
+    networks: "{{ kibana_docker_networks }}"
+    restart_policy: "{{ kibana_container_restart_policy }}"
+    volumes:
+      - "{{ kibana_conf_location }}/kibana.yml:/usr/share/kibana/config/kibana.yml:ro"
+    ports:
+      - "5601:5601"

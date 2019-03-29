@@ -2,7 +2,7 @@
 
 all:
   hosts:
-    192.168.33.22:
+    192.168.33.24:
       ansible_ssh_user: ansible
       is_prod: false
-      domain: "aura.healthcare.local"
+      domain: "aura.presentation.healthcare.local"

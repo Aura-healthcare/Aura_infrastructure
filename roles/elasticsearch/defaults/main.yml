@@ -1,0 +1,29 @@
+---
+
+# Name of the elasticsearch docker container
+elasticsearch_container_name: "elasticsearch"
+
+elasticsearch_root_location: "/opt/docker-data/{{ elasticsearch_container_name }}"
+
+# Path on the host filesystem where will be the elasticsearch conf file
+elasticsearch_conf_location: "{{elasticsearch_root_location}}/conf"
+
+#elasticsearch_docker_networks: []
+elasticsearch_docker_networks:
+  - name: "{{ aura_docker_network }}"
+
+elasticsearch_container_restart_policy: "always"
+
+elasticsearch_docker_expose:
+  - 9200:9200
+  - 9300:9300
+
+elasticsearch_docker_ports: "{{elasticsearch_docker_expose}}"
+
+elasticsearch_mlockall: false
+
+elasticsearch_max_local_storage_nodes: 1
+
+elasticsearch_zen_minimum_master_nodes: 1
+
+elasticsearch_mv_max_map_count: 262144

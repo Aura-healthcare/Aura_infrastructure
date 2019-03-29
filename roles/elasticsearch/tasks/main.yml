@@ -1,0 +1,28 @@
+---
+
+- name: create elasticsearch local directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: true
+  with_items:
+    - "{{ elasticsearch_root_location }}"
+    - "{{ elasticsearch_conf_location }}"
+
+- name: "Create configuration"
+  become: true
+  notify: restart elasticsearch
+  template:
+    src: "elasticsearch.yml.j2"
+    dest: "{{ elasticsearch_conf_location }}/elasticsearch.yml"
+
+- name: reload configuration with new value
+  become: true
+  notify: restart elasticsearch
+  #command: sudo sysctl -w vm.max_map_count="{{ elasticsearch_mv_max_map_count }}"
+  sysctl:
+    name: vm.max_map_count
+    value: "{{ elasticsearch_mv_max_map_count }}"
+
+- include_tasks: run_container.yml
