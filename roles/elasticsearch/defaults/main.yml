@@ -6,7 +6,10 @@ elasticsearch_container_name: "elasticsearch"
 elasticsearch_root_location: "/opt/docker-data/{{ elasticsearch_container_name }}"
 
 # Path on the host filesystem where will be the elasticsearch conf file
-elasticsearch_conf_location: "{{elasticsearch_root_location}}/conf"
+elasticsearch_conf_location: "{{ elasticsearch_root_location }}/conf"
+
+# Path on the host filesystem where will be the elasticsearch data files
+elasticsearch_data_location: "{{ elasticsearch_root_location }}/data"
 
 #elasticsearch_docker_networks: []
 elasticsearch_docker_networks:

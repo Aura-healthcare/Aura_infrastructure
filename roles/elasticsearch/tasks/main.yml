@@ -9,6 +9,7 @@
   with_items:
     - "{{ elasticsearch_root_location }}"
     - "{{ elasticsearch_conf_location }}"
+    - "{{ elasticsearch_data_location }}"
 
 - name: "Create configuration"
   become: true
@@ -20,9 +21,18 @@
 - name: reload configuration with new value
   become: true
   notify: restart elasticsearch
-  #command: sudo sysctl -w vm.max_map_count="{{ elasticsearch_mv_max_map_count }}"
+  command: sudo sysctl -w vm.max_map_count="{{ elasticsearch_mv_max_map_count }}"
+
+- name: set the value permanently
+  become: true
+  notify: restart elasticsearch
   sysctl:
     name: vm.max_map_count
     value: "{{ elasticsearch_mv_max_map_count }}"
+
+- name: give write access to data and logs directory
+  become: true
+  notify: restart elasticsearch
+  command: chown -R 1000:1000 "{{ elasticsearch_data_location }}"
 
 - include_tasks: run_container.yml

@@ -21,3 +21,14 @@
       - "{{ kibana_conf_location }}/kibana.yml:/usr/share/kibana/config/kibana.yml:ro"
     ports:
       - "5601:5601"
+
+- name: load dashboard with REST API
+  become: true
+  uri:
+    url: http://192.168.33.24:5601/api/kibana/dashboards/import
+    method: POST
+    body: "{{ lookup('file','../files/export_dashboard.json.j2') }}"
+    body_format: json
+    headers:
+      kbn-xsrf: true
+

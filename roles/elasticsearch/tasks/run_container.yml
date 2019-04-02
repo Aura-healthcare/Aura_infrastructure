@@ -19,6 +19,7 @@
     restart_policy: "{{ elasticsearch_container_restart_policy }}"
     volumes:
       - "{{ elasticsearch_conf_location }}/elasticsearch.yml:/config/elasticsearch.yml:ro"
+      - "{{ elasticsearch_data_location }}:/usr/share/elasticsearch/data:rw"
     ports:
       - "9200:9200"
       - "9300:9300"
