@@ -14,6 +14,8 @@
         - base
     - role: time_series_db
       tags: time_series_db
+    - role: prerequisite
+      tags: prerequisite
     - role: jupyter
       tags: jupyter
     - role: backend_webserver
@@ -26,9 +28,9 @@
       tags: data_injector
     - role: logstash
       tags: logstash
+    - role: metricbeat
+      tags: metricbeat
     - role: elasticsearch
       tags: elasticsearch
     - role: kibana
       tags: kibana
-    - role: logspout
-      tags: logspout

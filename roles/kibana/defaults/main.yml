@@ -4,7 +4,7 @@ kibana_container_name: "kibana"
 
 kibana_root_location: "/opt/docker-data/{{ kibana_container_name }}"
 kibana_conf_location: "{{ kibana_root_location }}/conf"
-kibana_data_location: "{{ kibana_root_location }}/data"
+kibana_dashboard_location: "{{ kibana_root_location }}/dashboard"
 
 #kibana_docker_networks: "{{ aura_docker_network }}"
 kibana_docker_networks:

@@ -22,12 +22,17 @@
     ports:
       - "5601:5601"
 
+- name: Wait for kibana startup
+  wait_for_connection:
+    delay: 120
+    timeout: 300
+
 - name: load dashboard with REST API
   become: true
   uri:
     url: http://192.168.33.24:5601/api/kibana/dashboards/import
     method: POST
-    body: "{{ lookup('file','../files/export_dashboard.json.j2') }}"
+    body: "{{ lookup('file','../templates/container_monitoring_dashboard.json.j2') }}"
     body_format: json
     headers:
       kbn-xsrf: true

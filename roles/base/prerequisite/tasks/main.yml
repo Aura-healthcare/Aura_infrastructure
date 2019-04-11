@@ -1,0 +1,6 @@
+---
+
+- name: Update distribution
+  yum: name=* state=latest
+
+
