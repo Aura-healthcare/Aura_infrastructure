@@ -1,0 +1,5 @@
+---
+
+- name: restart filebeat
+  set_fact:
+    filebeat_docker_restart: true

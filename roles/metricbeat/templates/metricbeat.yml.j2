@@ -8,5 +8,12 @@ setup.template.settings:
     index.number_of_shards: 1
     index.number_of_replicas: 0
 
+#----------------------------- Elasticsearch output --------------------------------
+
 output.elasticsearch:
-  hosts: ["192.168.33.24:9200"]
+  hosts: ["elasticsearch:9200"]
+
+#-------------------------------- Logstash output ----------------------------------
+
+#output.logstash:
+  #hosts: ["logstash:5044"]

@@ -1,0 +1,14 @@
+filebeat.inputs:
+- type: docker
+  containers.ids:
+    - '*'
+
+setup.template.settings:
+  index.number_of_shards: 1
+  index.number_of_replicas: 0
+
+#output.elasticsearch:
+  #hosts: ["elasticsearch:9200"]
+
+output.logstash:
+  hosts: ["logstash:5044"]

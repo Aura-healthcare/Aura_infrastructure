@@ -18,5 +18,7 @@
     networks: "{{ logstash_docker_networks }}"
     restart_policy: "{{ logstash_container_restart_policy }}"
     volumes:
-      - "{{ logstash_conf_location }}/logstash.yml:/usr/share/logstash/config/logstash.yml:ro"
       - "{{ logstash_pipeline_location }}/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
+    ports:
+      - "5044:5044"
+      - "9600:9600"

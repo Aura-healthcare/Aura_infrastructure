@@ -7,9 +7,9 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "centos/7"
 
-  config.vm.define "aura-presentation-vm" do |config|
-    config.vm.host_name = "aura-presentation-vm"
-    config.vm.network :private_network, ip: "192.168.33.24"
+  config.vm.define "aura-vm" do |config|
+    config.vm.host_name = "aura-vm"
+    config.vm.network :private_network, ip: "192.168.33.22"
     config.vm.provider :virtualbox do |vb|
       vb.customize ["modifyvm", :id, "--cpus", 2]
       vb.memory = 4096

@@ -1,28 +1,13 @@
 input {
-    udp {
-        port => 5000
-        codec => json
-    }
-}
-
-## Add your filters / logstash plugins configuration here
-
-filter {
-
-  if [docker][image] =~ /^logstash/ {
-    drop { }
+  beats {
+    port => 5044
   }
-
 }
 
 output {
-
-    elasticsearch {
-        hosts => "elasticsearch:9200"
-    }
-
-    stdout {
-        codec => rubydebug
-    }
-
+  elasticsearch {
+    hosts => "elasticsearch:9200"
+    manage_template => false
+    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+  }
 }

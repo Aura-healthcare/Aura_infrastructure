@@ -23,3 +23,13 @@
     ports:
       - "9200:9200"
       - "9300:9300"
+
+- name: Wait for elasticsearch startup
+  uri:
+    url: http://localhost:9200
+    method: GET
+    status: 200
+  register: _result
+  until: _result.status == 200
+  retries: 30
+  delay: 3
