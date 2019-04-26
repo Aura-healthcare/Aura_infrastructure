@@ -14,11 +14,6 @@
         - base
     - role: time_series_db
       tags: time_series_db
-    - role: base/prerequisite
-      tags:
-        - python3
-        - data_generation
-        - manual_data_injection
     - role: jupyter
       tags: jupyter
     - role: backend_webserver
