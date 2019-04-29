@@ -30,7 +30,7 @@
 - name: load container monitoring dashboard with REST API
   become: true
   uri:
-    url: http://192.168.33.22:5601/api/kibana/dashboards/import
+    url: http://localhost:5601/api/kibana/dashboards/import
     method: POST
     body: "{{ lookup('file','../templates/container_monitoring_dashboard.json.j2') }}"
     body_format: json
