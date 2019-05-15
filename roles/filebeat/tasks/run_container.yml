@@ -12,7 +12,7 @@
   become: true
   docker_container:
     name: "{{ filebeat_container_name }}"
-    image: docker.elastic.co/beats/filebeat:6.6.2
+    image: docker.elastic.co/beats/filebeat:{{ filebeat_version }}
     state: "{{ filebeat_docker_state | default('started') }}"
     restart: "{{ filebeat_docker_restart | default(false) | bool }}"
     networks: "{{ filebeat_docker_networks }}"
@@ -20,15 +20,14 @@
     user: root
     volumes:
       - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "{{ filebeat_conf_location }}/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
 
 - name: load filebeat template index
   become: true
   uri:
-    url: http://localhost:9200/_template/filebeat-6.6.2
+    url: "{{ filebeat_load_template_url }}"
     method: PUT
-    body: "{{ lookup('file','../templates/filebeat_template.json') }}"
+    body: "{{ lookup('file','../files/filebeat_template.json') }}"
     body_format: json
     headers:
       kbn-xsrf: true

@@ -12,7 +12,7 @@
   become: true
   docker_container:
     name: "{{ metricbeat_container_name }}"
-    image: docker.elastic.co/beats/metricbeat:6.7.0
+    image: docker.elastic.co/beats/metricbeat:{{ metricbeat_version }}
     state: "{{ metricbeat_docker_state | default('started') }}"
     restart: "{{ metricbeat_docker_restart | default(false) | bool }}"
     networks: "{{ metricbeat_docker_networks }}"
@@ -21,3 +21,13 @@
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "{{ metricbeat_conf_location }}/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro"
+
+- name: load metricbeat template index
+  become: true
+  uri:
+    url: "{{ metricbeat_load_template_url }}"
+    method: PUT
+    body: "{{ lookup('file','../files/metricbeat_template.json') }}"
+    body_format: json
+    headers:
+      kbn-xsrf: true

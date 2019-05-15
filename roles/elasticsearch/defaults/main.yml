@@ -17,16 +17,15 @@ elasticsearch_docker_networks:
 
 elasticsearch_container_restart_policy: "always"
 
-elasticsearch_docker_expose:
-  - 9200:9200
-  - 9300:9300
-
-elasticsearch_docker_ports: "{{elasticsearch_docker_expose}}"
-
-elasticsearch_mlockall: false
-
-elasticsearch_max_local_storage_nodes: 1
-
 elasticsearch_zen_minimum_master_nodes: 1
 
 elasticsearch_mv_max_map_count: 262144
+
+elasticsearch_data_location_owner: vagrant
+
+elasticsearch_data_location_group: vagrant
+
+elasticsearch_version: "6.6.2"
+
+influxdb_logs_load_template_url: "http://elasticsearch.aura.healthcare.local:80/_template/logstash"
+

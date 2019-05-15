@@ -12,7 +12,7 @@
   become: true
   docker_container:
     name: "{{ elasticsearch_container_name }}"
-    image: elasticsearch:6.6.2
+    image: elasticsearch:{{ elasticsearch_version }}
     state: "{{ elasticsearch_docker_state | default('started') }}"
     restart: "{{ elasticsearch_docker_restart | default(false) | bool }}"
     networks: "{{ elasticsearch_docker_networks }}"
@@ -20,16 +20,23 @@
     volumes:
       - "{{ elasticsearch_conf_location }}/elasticsearch.yml:/config/elasticsearch.yml:ro"
       - "{{ elasticsearch_data_location }}:/usr/share/elasticsearch/data:rw"
-    ports:
-      - "9200:9200"
-      - "9300:9300"
 
 - name: Wait for elasticsearch startup
   uri:
-    url: http://localhost:9200
+    url: http://elasticsearch.aura.healthcare.local:80
     method: GET
     status: 200
   register: _result
   until: _result.status == 200
   retries: 30
   delay: 3
+
+- name: load influxdb logs template index
+  become: true
+  uri:
+    url: "{{ influxdb_logs_load_template_url }}"
+    method: PUT
+    body: "{{ lookup('file','../files/influxdb_logs.json') }}"
+    body_format: json
+    headers:
+      kbn-xsrf: true

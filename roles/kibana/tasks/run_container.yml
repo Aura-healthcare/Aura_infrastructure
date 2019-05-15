@@ -12,27 +12,44 @@
   become: true
   docker_container:
     name: "{{ kibana_container_name }}"
-    image: kibana:6.6.2
+    image: kibana:{{ kibana_version }}
     state: "{{ kibana_docker_state | default('started') }}"
     restart: "{{ kibana_docker_restart | default(false) | bool }}"
     networks: "{{ kibana_docker_networks }}"
     restart_policy: "{{ kibana_container_restart_policy }}"
+    etc_hosts: >
+      {
+        "elasticsearch.aura.healthcare.local": "{{ aura_local_ip }}"
+      }
     volumes:
       - "{{ kibana_conf_location }}/kibana.yml:/usr/share/kibana/config/kibana.yml:ro"
-    ports:
-      - "5601:5601"
 
 - name: Wait for kibana startup
-  wait_for_connection:
-    delay: 120
-    timeout: 300
+  uri:
+    url: http://kibana.aura.healthcare.local:80
+    method: GET
+    status: 200
+  register: _result
+  until: _result.status == 200
+  retries: 30
+  delay: 3
 
 - name: load container monitoring dashboard with REST API
   become: true
   uri:
-    url: http://localhost:5601/api/kibana/dashboards/import
+    url: "{{ kibana_load_dashboard_url }}"
     method: POST
-    body: "{{ lookup('file','../templates/container_monitoring_dashboard.json.j2') }}"
+    body: "{{ lookup('file','../files/container_monitoring_dashboard.json') }}"
+    body_format: json
+    headers:
+      kbn-xsrf: true
+
+- name: load influxdb monitoring dashboard with REST API
+  become: true
+  uri:
+    url: "{{ kibana_load_dashboard_url }}"
+    method: POST
+    body: "{{ lookup('file','../files/influxdb_monitoring_dashboard.json') }}"
     body_format: json
     headers:
       kbn-xsrf: true

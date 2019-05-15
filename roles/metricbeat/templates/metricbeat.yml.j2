@@ -5,15 +5,10 @@ metricbeat.modules:
   period: 10s
 
 setup.template.settings:
-    index.number_of_shards: 1
-    index.number_of_replicas: 0
-
-#----------------------------- Elasticsearch output --------------------------------
-
-output.elasticsearch:
-  hosts: ["elasticsearch:9200"]
+    index.number_of_shards: {{ metricbeat_index_number_of_shards }}
+    index.number_of_replicas: {{ metricbeat_index_number_of_replicas }}
 
 #-------------------------------- Logstash output ----------------------------------
 
-#output.logstash:
-  #hosts: ["logstash:5044"]
+output.logstash:
+  hosts: ["logstash:{{ aura_logstash_port }}"]

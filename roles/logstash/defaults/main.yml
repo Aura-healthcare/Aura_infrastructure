@@ -8,6 +8,10 @@ logstash_pipeline_location: "{{ logstash_root_location }}/pipeline"
 
 #logstash_docker_networks: []
 logstash_docker_networks:
-  - name: "{{ aura_docker_network }}"
+  - name: "{{ metricbeat_filebeat_logstash_docker_network }}"
 
 logstash_container_restart_policy: "always"
+
+logstash_version: "6.6.2"
+
+logstash_output: "elasticsearch.aura.healthcare.local:80"

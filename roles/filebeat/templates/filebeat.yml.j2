@@ -4,11 +4,8 @@ filebeat.inputs:
     - '*'
 
 setup.template.settings:
-  index.number_of_shards: 1
-  index.number_of_replicas: 0
-
-#output.elasticsearch:
-  #hosts: ["elasticsearch:9200"]
+  index.number_of_shards: {{ filebeat_index_number_of_shards }}
+  index.number_of_replicas: {{ filebeat_index_number_of_replicas }}
 
 output.logstash:
-  hosts: ["logstash:5044"]
+  hosts: ["logstash:{{ aura_logstash_port }}"]

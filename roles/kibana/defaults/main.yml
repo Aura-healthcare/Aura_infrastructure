@@ -11,3 +11,9 @@ kibana_docker_networks:
   - name: "{{ aura_docker_network }}"
 
 kibana_container_restart_policy: "always"
+
+kibana_elasticsearch_input: "elasticsearch.aura.healthcare.local:80"
+
+kibana_load_dashboard_url: "http://kibana.aura.healthcare.local:80/api/kibana/dashboards/import"
+
+kibana_version: "6.6.2"

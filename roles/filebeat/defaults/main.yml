@@ -7,6 +7,14 @@ filebeat_conf_location: "{{ filebeat_root_location }}/conf"
 
 #filebeat_docker_networks: "{{ aura_docker_network }}"
 filebeat_docker_networks:
-  - name: "{{ aura_docker_network }}"
+  - name: "{{ metricbeat_filebeat_logstash_docker_network }}"
 
 filebeat_container_restart_policy: "always"
+
+filebeat_index_number_of_shards: 1
+
+filebeat_index_number_of_replicas: 0
+
+filebeat_version: "6.6.2"
+
+filebeat_load_template_url: "http://elasticsearch.aura.healthcare.local:80/_template/filebeat-{{ filebeat_version }}"

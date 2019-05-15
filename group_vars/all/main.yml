@@ -1,15 +1,23 @@
 ---
 
+aura_local_ip: "192.168.33.22"
+
 aura_docker_network: "skynet"
+
+metricbeat_filebeat_logstash_docker_network: "metricfilelogs"
 
 aura_time_series_db_container: "influxdb"
 aura_jupyter_container: "jupyterhub"
-aura_logstash_container: "logstash"
 aura_backend_webserver_container: "websocket-server"
 aura_monitoring_platform_container: "grafana"
 aura_scheduler_container: "airflow"
 
+aura_logstash_container: "logstash"
+aura_logstash_port: 5044
+
 aura_elasticsearch_container: "elasticsearch"
+aura_elasticsearch_port: 9200
+
 aura_kibana_container: "kibana"
 
 aura_time_series_db_port: 8086

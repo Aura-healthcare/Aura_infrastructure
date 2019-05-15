@@ -16,4 +16,11 @@
     src: "kibana.yml.j2"
     dest: "{{ kibana_conf_location }}/kibana.yml"
 
+- name: add kibana.aura.healhcare.local to hosts file
+  become: true
+  lineinfile:
+    path: /etc/hosts
+    line: '127.0.0.1  kibana.aura.healthcare.local'
+    create: yes
+
 - include_tasks: run_container.yml
