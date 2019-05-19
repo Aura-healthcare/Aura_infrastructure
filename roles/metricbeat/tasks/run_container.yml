@@ -2,13 +2,13 @@
 
 - meta: flush_handlers
 
-- name: Create a network
+- name: create a network
   become: true
   docker_network:
     name: "{{ item.name }}"
   with_items: "{{ metricbeat_docker_networks }}"
 
-- name: Start or restart metricbeat container
+- name: start or restart metricbeat container
   become: true
   docker_container:
     name: "{{ metricbeat_container_name }}"

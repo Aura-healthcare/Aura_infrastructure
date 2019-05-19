@@ -2,13 +2,13 @@
 
 - meta: flush_handlers
 
-- name: Create a network
+- name: create a network
   become: true
   docker_network:
     name: "{{ item.name }}"
   with_items: "{{ filebeat_docker_networks }}"
 
-- name: Start or restart filebeat container
+- name: start or restart filebeat container
   become: true
   docker_container:
     name: "{{ filebeat_container_name }}"

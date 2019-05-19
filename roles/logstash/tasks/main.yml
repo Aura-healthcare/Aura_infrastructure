@@ -8,13 +8,21 @@
     recurse: true
   with_items:
     - "{{ logstash_pipeline_location }}"
+    - "{{ logs_directory }}"
 
-- name: create configuration
+- name: create configuration for pipeline
   become: true
   notify: restart logstash
   template:
     src: "logstash.conf.j2"
     dest: "{{ logstash_pipeline_location }}/logstash.conf"
+
+- name: create yml configuration
+  become: true
+  notify: restart logstash
+  template:
+    src: "logstash.yml.j2"
+    dest: "{{ logstash_pipeline_location }}/logstash.yml"
 
 - name: create logs files
   become: true
@@ -22,6 +30,7 @@
     path: "{{ item }}"
     state: touch
   with_items:
-    - "/home/ansible/influxdb_manual_logs-json.log"
+    - "{{ logs_directory }}/influxdb_manual_logs_input-json.log"
+    - "{{ logs_directory }}/influxdb_manual_logs_output-json.log"
 
 - include_tasks: run_container.yml

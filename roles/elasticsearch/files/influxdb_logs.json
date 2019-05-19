@@ -15,6 +15,9 @@
         "timestamp": {
           "type": "date",
           "format": "MMM dd YYYY, HH:mm:ss.SSS"
+        },
+        "input-or-output": {
+          "type": "text"
         }
       }
     }

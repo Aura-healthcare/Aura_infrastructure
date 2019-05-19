@@ -27,5 +27,9 @@ elasticsearch_data_location_group: vagrant
 
 elasticsearch_version: "6.6.2"
 
+elasticsearch_cluster_name: "docker-cluster"
+
+elasticsearch_discovery_type: "single-node"
+
 influxdb_logs_load_template_url: "http://elasticsearch.aura.healthcare.local:80/_template/logstash"
 

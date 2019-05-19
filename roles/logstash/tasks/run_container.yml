@@ -2,13 +2,13 @@
 
 - meta: flush_handlers
 
-- name: Create a network
+- name: create a network
   become: true
   docker_network:
     name: "{{ item.name }}"
   with_items: "{{ logstash_docker_networks }}"
 
-- name: Start or restart logstash container
+- name: start or restart logstash container
   become: true
   docker_container:
     name: "{{ logstash_container_name }}"
@@ -23,4 +23,6 @@
       }
     volumes:
       - "{{ logstash_pipeline_location }}/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
-      - "/home/ansible/influxdb_manual_logs-json.log:/usr/share/logstash/influxdb_logs/influxdb_manual_logs-json.log:rw"
+      - "{{ logstash_pipeline_location }}/logstash.yml:/usr/share/logstash/config/logstash.yml:ro"
+      - "{{ logs_directory }}/influxdb_manual_logs_input-json.log:/usr/share/logstash/influxdb_logs/influxdb_manual_logs_input-json.log:rw"
+      - "{{ logs_directory }}/influxdb_manual_logs_output-json.log:/usr/share/logstash/influxdb_logs/influxdb_manual_logs_output-json.log:rw"

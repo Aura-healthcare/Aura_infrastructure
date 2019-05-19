@@ -15,3 +15,5 @@ logstash_container_restart_policy: "always"
 logstash_version: "6.6.2"
 
 logstash_output: "elasticsearch.aura.healthcare.local:80"
+
+logs_directory: "/home/ansible/personal_logs"

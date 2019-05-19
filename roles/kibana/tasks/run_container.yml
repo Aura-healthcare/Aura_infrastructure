@@ -2,13 +2,13 @@
 
 - meta: flush_handlers
 
-- name: Create a network
+- name: create a network
   become: true
   docker_network:
     name: "{{ item.name }}"
   with_items: "{{ kibana_docker_networks }}"
 
-- name: Start or restart kibana container
+- name: start or restart kibana container
   become: true
   docker_container:
     name: "{{ kibana_container_name }}"
@@ -24,9 +24,9 @@
     volumes:
       - "{{ kibana_conf_location }}/kibana.yml:/usr/share/kibana/config/kibana.yml:ro"
 
-- name: Wait for kibana startup
+- name: wait for kibana startup
   uri:
-    url: http://kibana.aura.healthcare.local:80
+    url: "{{ kibana_url }}"
     method: GET
     status: 200
   register: _result

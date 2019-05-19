@@ -2,13 +2,13 @@
 
 - meta: flush_handlers
 
-- name: Create a network
+- name: create a network
   become: true
   docker_network:
     name: "{{ item.name }}"
   with_items: "{{ elasticsearch_docker_networks }}"
 
-- name: Start or restart elasticsearch container
+- name: start or restart elasticsearch container
   become: true
   docker_container:
     name: "{{ elasticsearch_container_name }}"
@@ -18,10 +18,10 @@
     networks: "{{ elasticsearch_docker_networks }}"
     restart_policy: "{{ elasticsearch_container_restart_policy }}"
     volumes:
-      - "{{ elasticsearch_conf_location }}/elasticsearch.yml:/config/elasticsearch.yml:ro"
+      - "{{ elasticsearch_conf_location }}/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro"
       - "{{ elasticsearch_data_location }}:/usr/share/elasticsearch/data:rw"
 
-- name: Wait for elasticsearch startup
+- name: wait for elasticsearch startup
   uri:
     url: http://elasticsearch.aura.healthcare.local:80
     method: GET

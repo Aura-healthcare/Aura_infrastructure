@@ -7,7 +7,7 @@ input {
 
     file {
         type => "personal_logs"
-        path => "/usr/share/logstash/influxdb_logs/influxdb_manual_logs-json.log"
+        path => "/usr/share/logstash/influxdb_logs/*-json.log"
         start_position => "beginning"
     }
 
@@ -16,7 +16,7 @@ input {
 filter {
     if [type] == "personal_logs" {
         grok {
-            match => { "message" => "%{WORD:month} %{NUMBER:day} %{NUMBER:year}, %{NUMBER:hour}:%{NUMBER:minutes}:%{NUMBER:seconds} : monitoring-%{WORD:data-type}-input : %{NUMBER:nb-inserted-data}" }
+            match => { "message" => "%{WORD:month} %{NUMBER:day} %{NUMBER:year}, %{NUMBER:hour}:%{NUMBER:minutes}:%{NUMBER:seconds} : monitoring-%{WORD:data-type}-%{WORD:input-or-output} : %{NUMBER:nb-inserted-data}" }
         }
         mutate {
             add_field => { "timestamp" => "%{month} %{day} %{year}, %{hour}:%{minutes}:%{seconds}" }
