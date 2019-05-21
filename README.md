@@ -38,3 +38,48 @@ To have a local url that route to this development environment you can add this 
 Once you have executed the `vagrand up` command and run the `install.yml` playbook on the development environment you can change the configuration of the mobile app to use the `db.aura.healthcare.local` url, you can do any test.
 
 You can ssh to the virtual machine with `ssh ansible@192.168.33.22` 
+
+
+## ELK stack
+
+Five docker containers compone a monitoring plateform
+
+### Filebeat
+
+Filebeat is a lightweight logs shipper. It is only used to recover logs from all docker containers.
+
+### Metricbeat
+
+Metricbeat is a lightweight metric shipper. It is only used to recover metrics from all docker containers.
+
+### Logstash
+
+Two logs files are created to gather informations about data loading in influxdb database. Logstash harvests, transforms and analyzes these logs and sends them to elasticsearch.
+
+Metrics and logs from above-mentionned beat logs shippers are also retrieved by logstash but not processed. They are also sent to elasticsearch.
+
+### Elasticsearch
+
+Elasticsearch stores and index data sent by logstash. Using logstash as output for beat logs shippers forces to load manually indexes templates.
+    - filebeat-6.6.2-* is used for docker containers logs from filebeat
+    - metricbeat-6.6.2-* is used for docker containers metrics from metricbeat
+    - logstash-* is used for personal logs harvested by logstash itself
+
+### Kibana
+
+Kibana is used to display relevant dashboard. Two dashboard are uploaded in kibana.
+
+The container_monitoring_dashboard allows to follow docker containers system metrics. It displays CPU, memory, number of container etc ...
+
+The influxdb_monitoring_dashboard monitors the influxdb container. This dashboard displays influxdb's metrics. It adds two visualizations :
+    - Nb input / time displays the total amount of data about to be stored during an injection along the time.
+    - Nb output / time displays the total amount of data stored in the database during an injection along the time.
+
+To load your own dashboard, follow the steps:
+    - create your visualizations with the kibana UI
+    - create your dashboard with the kibana UI using the visualizations you have created before
+    - download your dashboard's json format using the REST API:
+        `curl -X GET "192.168.33.23:5601/api/kibana/dashboards/export?dashboard=*id*" -H 'kbn-xsrf: true'`
+        replace *id* by yout dashboard's id in kibana
+    - add the json script in a file in /kibana/files
+    - add a task in /kibana/tasks/run_container.yml (just copy paste a load task and change the file in the body module) to upload your dashboard in kibana each time you rebuild the stack.
