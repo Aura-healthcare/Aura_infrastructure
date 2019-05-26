@@ -18,4 +18,6 @@ metricbeat_index_number_of_replicas: 0
 
 metricbeat_version: "6.7.0"
 
-metricbeat_load_template_url: "http://elasticsearch.aura.healthcare.local:80/_template/metricbeat-{{ metricbeat_version }}"
+metricbeat_load_template_url: "http://elasticsearch.{{ domain }}/_template/metricbeat-{{ metricbeat_version }}"
+
+metricbeat_logstash_host: "{{ aura_logstash_container }}"

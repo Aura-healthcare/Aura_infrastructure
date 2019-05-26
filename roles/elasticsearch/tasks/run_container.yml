@@ -23,7 +23,7 @@
 
 - name: wait for elasticsearch startup
   uri:
-    url: http://elasticsearch.aura.healthcare.local:80
+    url: "http://elasticsearch.{{ domain }}"
     method: GET
     status: 200
   register: _result

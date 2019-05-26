@@ -12,10 +12,12 @@ kibana_docker_networks:
 
 kibana_container_restart_policy: "always"
 
-kibana_elasticsearch_input: "http://elasticsearch.aura.healthcare.local:80"
+kibana_elasticsearch_input: "http://elasticsearch.{{ domain }}:80"
 
-kibana_url: "http://kibana.aura.healthcare.local:80"
+kibana_url: "http://kibana.{{ domain }}"
 
 kibana_load_dashboard_url: "{{ kibana_url }}/api/kibana/dashboards/import"
 
 kibana_version: "6.6.2"
+
+add_to_hosts_for_dev: ""

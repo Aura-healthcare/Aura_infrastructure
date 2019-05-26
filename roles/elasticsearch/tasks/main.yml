@@ -29,15 +29,26 @@
   become: true
   file:
     path: "{{ elasticsearch_data_location }}"
+    group: 1000
+    owner: 1000
+    recurse: yes
+  when: is_prod == true
+
+- name: give write access to data and logs directory
+  become: true
+  file:
+    path: "{{ elasticsearch_data_location }}"
     group: vagrant
     owner: vagrant
     recurse: yes
+  when: is_prod == false
 
 - name: add elasticsearch.aura.healhcare.local to hosts file
   become: true
   lineinfile:
     path: /etc/hosts
-    line: '127.0.0.1  elasticsearch.aura.healthcare.local'
+    line: '127.0.0.1  elasticsearch.{{ domain }}'
     create: yes
+  when: is_prod == false
 
 - include_tasks: run_container.yml

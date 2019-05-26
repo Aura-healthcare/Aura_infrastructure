@@ -8,7 +8,7 @@
     recurse: true
   with_items:
     - "{{ logstash_pipeline_location }}"
-    - "{{ logs_directory }}"
+    - "{{ logs_directory_location }}"
 
 - name: create configuration for pipeline
   become: true
@@ -30,7 +30,7 @@
     path: "{{ item }}"
     state: touch
   with_items:
-    - "{{ logs_directory }}/influxdb_manual_logs_input-json.log"
-    - "{{ logs_directory }}/influxdb_manual_logs_output-json.log"
+    - "{{ logs_directory_location }}/influxdb_manual_logs_input-json.log"
+    - "{{ logs_directory_location }}/influxdb_manual_logs_output-json.log"
 
 - include_tasks: run_container.yml

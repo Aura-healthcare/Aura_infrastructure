@@ -8,6 +8,11 @@
     name: "{{ item.name }}"
   with_items: "{{ kibana_docker_networks }}"
 
+- name: set variable to add to hosts if dev environment
+  set_fact:
+    add_to_hosts_for_dev=""elasticsearch.{{ domain }}":"{{ aura_local_ip }}""
+  when: is_prod == false
+
 - name: start or restart kibana container
   become: true
   docker_container:
@@ -19,7 +24,7 @@
     restart_policy: "{{ kibana_container_restart_policy }}"
     etc_hosts: >
       {
-        "elasticsearch.aura.healthcare.local": "{{ aura_local_ip }}"
+        {{ add_to_hosts_for_dev }}
       }
     volumes:
       - "{{ kibana_conf_location }}/kibana.yml:/usr/share/kibana/config/kibana.yml:ro"
@@ -31,7 +36,7 @@
     status: 200
   register: _result
   until: _result.status == 200
-  retries: 30
+  retries: 40
   delay: 3
 
 - name: load container monitoring dashboard with REST API

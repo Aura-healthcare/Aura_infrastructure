@@ -11,4 +11,4 @@ setup.template.settings:
 #-------------------------------- Logstash output ----------------------------------
 
 output.logstash:
-  hosts: ["logstash:{{ aura_logstash_port }}"]
+  hosts: ["{{ metricbeat_logstash_host }}:{{ aura_logstash_port }}"]

@@ -8,6 +8,10 @@
     name: "{{ item.name }}"
   with_items: "{{ logstash_docker_networks }}"
 
+- name: set variable to add to hosts if dev environment
+  set_fact:
+    add_to_hosts_for_dev=""elasticsearch.{{ domain }}":"{{ aura_local_ip }}""
+  when: is_prod == false
 - name: start or restart logstash container
   become: true
   docker_container:
@@ -19,10 +23,10 @@
     restart_policy: "{{ logstash_container_restart_policy }}"
     etc_hosts: >
       {
-        "elasticsearch.aura.healthcare.local": "{{ aura_local_ip }}"
+        {{ add_to_hosts_for_dev }}
       }
     volumes:
       - "{{ logstash_pipeline_location }}/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
       - "{{ logstash_pipeline_location }}/logstash.yml:/usr/share/logstash/config/logstash.yml:ro"
-      - "{{ logs_directory }}/influxdb_manual_logs_input-json.log:/usr/share/logstash/influxdb_logs/influxdb_manual_logs_input-json.log:rw"
-      - "{{ logs_directory }}/influxdb_manual_logs_output-json.log:/usr/share/logstash/influxdb_logs/influxdb_manual_logs_output-json.log:rw"
+      - "{{ logs_directory_location }}/influxdb_manual_logs_input-json.log:/usr/share/logstash/influxdb_logs/influxdb_manual_logs_input-json.log:rw"
+      - "{{ logs_directory_location }}/influxdb_manual_logs_output-json.log:/usr/share/logstash/influxdb_logs/influxdb_manual_logs_output-json.log:rw"

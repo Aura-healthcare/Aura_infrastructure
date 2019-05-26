@@ -3,8 +3,8 @@
 logstash_container_name: "logstash"
 
 logstash_root_location: "/opt/docker-data/{{ logstash_container_name }}"
-logstash_conf_location: "{{ logstash_root_location }}/conf"
 logstash_pipeline_location: "{{ logstash_root_location }}/pipeline"
+logs_directory_location: "{{ logstash_root_location }}/personal_logs"
 
 #logstash_docker_networks: []
 logstash_docker_networks:
@@ -14,6 +14,6 @@ logstash_container_restart_policy: "always"
 
 logstash_version: "6.6.2"
 
-logstash_output: "elasticsearch.aura.healthcare.local:80"
+logstash_output: "elasticsearch.{{ domain }}:80"
 
-logs_directory: "/home/ansible/personal_logs"
+add_to_hosts_for_dev: ""

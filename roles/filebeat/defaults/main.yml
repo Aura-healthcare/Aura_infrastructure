@@ -17,4 +17,6 @@ filebeat_index_number_of_replicas: 0
 
 filebeat_version: "6.6.2"
 
-filebeat_load_template_url: "http://elasticsearch.aura.healthcare.local:80/_template/filebeat-{{ filebeat_version }}"
+filebeat_load_template_url: "http://elasticsearch.{{ domain }}/_template/filebeat-{{ filebeat_version }}"
+
+filebeat_logstash_host: "{{ aura_logstash_container }}"

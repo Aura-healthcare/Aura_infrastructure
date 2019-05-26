@@ -20,7 +20,8 @@
   become: true
   lineinfile:
     path: /etc/hosts
-    line: '127.0.0.1  kibana.aura.healthcare.local'
+    line: '127.0.0.1  kibana.{{ domain }}'
     create: yes
+  when: is_prod == false
 
 - include_tasks: run_container.yml

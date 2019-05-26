@@ -8,4 +8,4 @@ setup.template.settings:
   index.number_of_replicas: {{ filebeat_index_number_of_replicas }}
 
 output.logstash:
-  hosts: ["logstash:{{ aura_logstash_port }}"]
+  hosts: ["{{ filebeat_logstash_host }}:{{ aura_logstash_port }}"]
