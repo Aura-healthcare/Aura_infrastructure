@@ -2,10 +2,9 @@
 
 aura_local_ip: "192.168.33.22"
 
-
 aura_docker_network: "skynet"
 
-metricbeat_filebeat_logstash_docker_network: "metricfilelogs"
+metricbeat_filebeat_logstash_docker_network: "spynet"
 
 aura_time_series_db_container: "influxdb"
 aura_jupyter_container: "jupyterhub"

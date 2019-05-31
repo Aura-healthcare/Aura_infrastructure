@@ -11,7 +11,7 @@
     - "{{ elasticsearch_conf_location }}"
     - "{{ elasticsearch_data_location }}"
 
-- name: "Create configuration"
+- name: create configuration
   become: true
   notify: restart elasticsearch
   template:

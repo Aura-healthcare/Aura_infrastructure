@@ -3,6 +3,10 @@ filebeat.inputs:
   containers.ids:
     - '*'
 
+processors:
+- add_docker_metadata:
+    hosts: "unix:///var/run/docker.sock"
+
 setup.template.settings:
   index.number_of_shards: {{ filebeat_index_number_of_shards }}
   index.number_of_replicas: {{ filebeat_index_number_of_replicas }}

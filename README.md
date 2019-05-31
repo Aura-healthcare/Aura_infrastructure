@@ -44,6 +44,8 @@ You can ssh to the virtual machine with `ssh ansible@192.168.33.22`
 
 Five docker containers compone a monitoring plateform
 
+![Alt text](images/elk_diagram.png)
+
 ### Filebeat
 
 Filebeat is a lightweight logs shipper. It is only used to recover logs from all docker containers.
@@ -79,7 +81,7 @@ To load your own dashboard, follow the steps:
     - create your visualizations with the kibana UI
     - create your dashboard with the kibana UI using the visualizations you have created before
     - download your dashboard's json format using the REST API:
-        `curl -X GET "192.168.33.23:5601/api/kibana/dashboards/export?dashboard=*id*" -H 'kbn-xsrf: true'`
+        `curl -X GET "kibana.aura.healthcare.local:80/api/kibana/dashboards/export?dashboard=*id*" -H 'kbn-xsrf: true'`
         replace *id* by yout dashboard's id in kibana
     - add the json script in a file in /kibana/files
     - add a task in /kibana/tasks/run_container.yml (just copy paste a load task and change the file in the body module) to upload your dashboard in kibana each time you rebuild the stack.

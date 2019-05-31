@@ -20,6 +20,7 @@
     user: root
     volumes:
       - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "{{ filebeat_conf_location }}/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
 
 - name: load filebeat template index
