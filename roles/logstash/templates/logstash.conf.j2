@@ -1,0 +1,40 @@
+input {
+
+    beats {
+        type => "docker_containers_logs"
+        port => {{ aura_logstash_port }}
+    }
+
+    file {
+        type => "personal_logs"
+        path => "/usr/share/logstash/influxdb_logs/*-json.log"
+        start_position => "beginning"
+    }
+
+}
+
+filter {
+    if [type] == "personal_logs" {
+        grok {
+            match => { "message" => "%{WORD:month} %{NUMBER:day} %{NUMBER:year}, %{NUMBER:hour}:%{NUMBER:minutes}:%{NUMBER:seconds} : monitoring-%{WORD:data-type}-%{WORD:input-or-output} : %{NUMBER:nb-inserted-data}" }
+        }
+        mutate {
+            add_field => { "timestamp" => "%{month} %{day} %{year}, %{hour}:%{minutes}:%{seconds}" }
+        }
+    }
+}
+
+output {
+    if [type] == "personal_logs" {
+        elasticsearch {
+            hosts => "{{ logstash_output }}"
+        }
+    }
+    if [type] == "docker_containers_logs" {
+        elasticsearch {
+            hosts => "{{ logstash_output }}"
+            manage_template => false
+            index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+        }
+    }
+}

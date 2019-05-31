@@ -1,0 +1,36 @@
+---
+
+- name: create logstash local directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: true
+  with_items:
+    - "{{ logstash_pipeline_location }}"
+    - "{{ logs_directory_location }}"
+
+- name: create configuration for pipeline
+  become: true
+  notify: restart logstash
+  template:
+    src: "logstash.conf.j2"
+    dest: "{{ logstash_pipeline_location }}/logstash.conf"
+
+- name: create yml configuration
+  become: true
+  notify: restart logstash
+  template:
+    src: "logstash.yml.j2"
+    dest: "{{ logstash_pipeline_location }}/logstash.yml"
+
+- name: create logs files
+  become: true
+  file:
+    path: "{{ item }}"
+    state: touch
+  with_items:
+    - "{{ logs_directory_location }}/influxdb_manual_logs_input-json.log"
+    - "{{ logs_directory_location }}/influxdb_manual_logs_output-json.log"
+
+- include_tasks: run_container.yml

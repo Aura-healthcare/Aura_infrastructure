@@ -1,0 +1,42 @@
+---
+
+- meta: flush_handlers
+
+- name: create a network
+  become: true
+  docker_network:
+    name: "{{ item.name }}"
+  with_items: "{{ elasticsearch_docker_networks }}"
+
+- name: start or restart elasticsearch container
+  become: true
+  docker_container:
+    name: "{{ elasticsearch_container_name }}"
+    image: elasticsearch:{{ elasticsearch_version }}
+    state: "{{ elasticsearch_docker_state | default('started') }}"
+    restart: "{{ elasticsearch_docker_restart | default(false) | bool }}"
+    networks: "{{ elasticsearch_docker_networks }}"
+    restart_policy: "{{ elasticsearch_container_restart_policy }}"
+    volumes:
+      - "{{ elasticsearch_conf_location }}/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro"
+      - "{{ elasticsearch_data_location }}:/usr/share/elasticsearch/data:rw"
+
+- name: wait for elasticsearch startup
+  uri:
+    url: "http://elasticsearch.{{ domain }}"
+    method: GET
+    status: 200
+  register: _result
+  until: _result.status == 200
+  retries: 30
+  delay: 3
+
+- name: load influxdb logs template index
+  become: true
+  uri:
+    url: "{{ influxdb_logs_load_template_url }}"
+    method: PUT
+    body: "{{ lookup('file','../files/influxdb_logs.json') }}"
+    body_format: json
+    headers:
+      kbn-xsrf: true

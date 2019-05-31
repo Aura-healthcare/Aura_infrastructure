@@ -35,4 +35,3 @@
     - CREATE CONTINUOUS QUERY x_gyro_count_by_day ON {{aura_physio_data_db_name}} BEGIN SELECT count("x_gyro") INTO "x_gyro_count_by_day" FROM "MotionGyroscope" GROUP BY time(1d), "user" END
     - CREATE CONTINUOUS QUERY y_gyro_count_by_day ON {{aura_physio_data_db_name}} BEGIN SELECT count("y_gyro") INTO "y_gyro_count_by_day" FROM "MotionGyroscope" GROUP BY time(1d), "user" END
     - CREATE CONTINUOUS QUERY z_gyro_count_by_day ON {{aura_physio_data_db_name}} BEGIN SELECT count("z_gyro") INTO "z_gyro_count_by_day" FROM "MotionGyroscope" GROUP BY time(1d), "user" END
-

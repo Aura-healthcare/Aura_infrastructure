@@ -1,0 +1,33 @@
+---
+
+- meta: flush_handlers
+
+- name: create a network
+  become: true
+  docker_network:
+    name: "{{ item.name }}"
+  with_items: "{{ metricbeat_docker_networks }}"
+
+- name: start or restart metricbeat container
+  become: true
+  docker_container:
+    name: "{{ metricbeat_container_name }}"
+    image: docker.elastic.co/beats/metricbeat:{{ metricbeat_version }}
+    state: "{{ metricbeat_docker_state | default('started') }}"
+    restart: "{{ metricbeat_docker_restart | default(false) | bool }}"
+    networks: "{{ metricbeat_docker_networks }}"
+    restart_policy: "{{ metricbeat_container_restart_policy }}"
+    user: root
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "{{ metricbeat_conf_location }}/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro"
+
+- name: load metricbeat template index
+  become: true
+  uri:
+    url: "{{ metricbeat_load_template_url }}"
+    method: PUT
+    body: "{{ lookup('file','../files/metricbeat_template.json') }}"
+    body_format: json
+    headers:
+      kbn-xsrf: true

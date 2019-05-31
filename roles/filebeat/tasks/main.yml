@@ -1,0 +1,19 @@
+---
+
+- name: create filebeat local directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: true
+  with_items:
+    - "{{ filebeat_conf_location }}"
+
+- name: create configuration
+  become: true
+  notify: restart filebeat
+  template:
+    src: "filebeat.yml.j2"
+    dest: "{{ filebeat_conf_location }}/filebeat.yml"
+
+- include_tasks: run_container.yml

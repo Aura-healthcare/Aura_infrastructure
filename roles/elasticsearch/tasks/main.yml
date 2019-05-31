@@ -1,0 +1,54 @@
+---
+
+- name: create elasticsearch local directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: true
+  with_items:
+    - "{{ elasticsearch_root_location }}"
+    - "{{ elasticsearch_conf_location }}"
+    - "{{ elasticsearch_data_location }}"
+
+- name: create configuration
+  become: true
+  notify: restart elasticsearch
+  template:
+    src: "elasticsearch.yml.j2"
+    dest: "{{ elasticsearch_conf_location }}/elasticsearch.yml"
+
+- name: set the value permanently
+  become: true
+  notify: restart elasticsearch
+  sysctl:
+    name: vm.max_map_count
+    value: "{{ elasticsearch_mv_max_map_count }}"
+
+- name: give write access to data and logs directory
+  become: true
+  file:
+    path: "{{ elasticsearch_data_location }}"
+    group: 1000
+    owner: 1000
+    recurse: yes
+  when: is_prod == true
+
+- name: give write access to data and logs directory
+  become: true
+  file:
+    path: "{{ elasticsearch_data_location }}"
+    group: vagrant
+    owner: vagrant
+    recurse: yes
+  when: is_prod == false
+
+- name: add elasticsearch.aura.healhcare.local to hosts file
+  become: true
+  lineinfile:
+    path: /etc/hosts
+    line: '127.0.0.1  elasticsearch.{{ domain }}'
+    create: yes
+  when: is_prod == false
+
+- include_tasks: run_container.yml

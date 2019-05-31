@@ -1,0 +1,27 @@
+---
+
+- name: create kibana local directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: true
+  with_items:
+    - "{{ kibana_conf_location }}"
+
+- name: create configuration
+  become: true
+  notify: restart kibana
+  template:
+    src: "kibana.yml.j2"
+    dest: "{{ kibana_conf_location }}/kibana.yml"
+
+- name: add kibana.aura.healhcare.local to hosts file
+  become: true
+  lineinfile:
+    path: /etc/hosts
+    line: '127.0.0.1  kibana.{{ domain }}'
+    create: yes
+  when: is_prod == false
+
+- include_tasks: run_container.yml

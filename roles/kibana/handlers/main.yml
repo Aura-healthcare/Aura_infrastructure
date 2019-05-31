@@ -1,0 +1,7 @@
+---
+
+- name: restart kibana
+  set_fact:
+    kibana_docker_restart: true
+
+

@@ -1,0 +1,34 @@
+---
+
+- meta: flush_handlers
+
+- name: create a network
+  become: true
+  docker_network:
+    name: "{{ item.name }}"
+  with_items: "{{ filebeat_docker_networks }}"
+
+- name: start or restart filebeat container
+  become: true
+  docker_container:
+    name: "{{ filebeat_container_name }}"
+    image: docker.elastic.co/beats/filebeat:{{ filebeat_version }}
+    state: "{{ filebeat_docker_state | default('started') }}"
+    restart: "{{ filebeat_docker_restart | default(false) | bool }}"
+    networks: "{{ filebeat_docker_networks }}"
+    restart_policy: "{{ filebeat_container_restart_policy }}"
+    user: root
+    volumes:
+      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "{{ filebeat_conf_location }}/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
+
+- name: load filebeat template index
+  become: true
+  uri:
+    url: "{{ filebeat_load_template_url }}"
+    method: PUT
+    body: "{{ lookup('file','../files/filebeat_template.json') }}"
+    body_format: json
+    headers:
+      kbn-xsrf: true

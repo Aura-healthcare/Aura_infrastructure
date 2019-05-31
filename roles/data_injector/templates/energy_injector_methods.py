@@ -24,12 +24,10 @@ ACCELEROMETER_MEASUREMENT_NAME = "MotionAccelerometer"
 def get_user_list(client) -> List[str]:
     """
     Get the list of all distinct user in the influxDB database.
-
     Arguments
     ---------
     client: Client object
         influxDB client to connect to database.
-
     :return usr_list: list of all distinct user in database.
     """
     # Get list of all users
@@ -68,7 +66,6 @@ def extract_raw_data_from_influxdb(client, measurement: str, user_id: str, start
 
 def get_first_timestamp_to_compute_energy(user_id: str, client):
     """
-
     :param user_id:
     :param client:
     :return:
@@ -111,7 +108,6 @@ def get_time_difference_between_now_and_timestamp(timestamp):
 def transform_acm_result_set_into_dataframe(result_set: str, tags: dict) -> pd.DataFrame:
     """
     TODO
-
     :param result_set:
     :param tags:
     :return:

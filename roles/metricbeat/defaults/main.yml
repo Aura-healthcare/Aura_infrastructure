@@ -1,0 +1,23 @@
+---
+
+metricbeat_container_name: "metricbeat"
+
+metricbeat_root_location: "/opt/docker-data/{{ metricbeat_container_name }}"
+metricbeat_conf_location: "{{ metricbeat_root_location }}/conf"
+metricbeat_pipeline_location: "{{ metricbeat_root_location }}/pipeline"
+
+#metricbeat_docker_networks: []
+metricbeat_docker_networks:
+  - name: "{{ metricbeat_filebeat_logstash_docker_network }}"
+
+metricbeat_container_restart_policy: "always"
+
+metricbeat_index_number_of_shards: 1
+
+metricbeat_index_number_of_replicas: 0
+
+metricbeat_version: "6.7.0"
+
+metricbeat_load_template_url: "http://elasticsearch.{{ domain }}/_template/metricbeat-{{ metricbeat_version }}"
+
+metricbeat_logstash_host: "{{ aura_logstash_container }}"

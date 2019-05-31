@@ -1,0 +1,32 @@
+---
+
+- meta: flush_handlers
+
+- name: create a network
+  become: true
+  docker_network:
+    name: "{{ item.name }}"
+  with_items: "{{ logstash_docker_networks }}"
+
+- name: set variable to add to hosts if dev environment
+  set_fact:
+    add_to_hosts_for_dev=""elasticsearch.{{ domain }}":"{{ aura_local_ip }}""
+  when: is_prod == false
+- name: start or restart logstash container
+  become: true
+  docker_container:
+    name: "{{ logstash_container_name }}"
+    image: logstash:{{ logstash_version }}
+    state: "{{ logstash_docker_state | default('started') }}"
+    restart: "{{ logstash_docker_restart | default(false) | bool }}"
+    networks: "{{ logstash_docker_networks }}"
+    restart_policy: "{{ logstash_container_restart_policy }}"
+    etc_hosts: >
+      {
+        {{ add_to_hosts_for_dev }}
+      }
+    volumes:
+      - "{{ logstash_pipeline_location }}/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
+      - "{{ logstash_pipeline_location }}/logstash.yml:/usr/share/logstash/config/logstash.yml:ro"
+      - "{{ logs_directory_location }}/influxdb_manual_logs_input-json.log:/usr/share/logstash/influxdb_logs/influxdb_manual_logs_input-json.log:rw"
+      - "{{ logs_directory_location }}/influxdb_manual_logs_output-json.log:/usr/share/logstash/influxdb_logs/influxdb_manual_logs_output-json.log:rw"

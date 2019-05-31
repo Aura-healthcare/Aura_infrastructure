@@ -1,0 +1,5 @@
+---
+
+- name: restart logstash
+  set_fact:
+    logstash_docker_restart: true

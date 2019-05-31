@@ -3,7 +3,7 @@
 - name : Create websocket-server local directories
   become: true
   file:
-    path: "{{ item }}" 
+    path: "{{ item }}"
     state: directory
     recurse: true
   with_items:
@@ -17,7 +17,7 @@
 - name: Pull aura-websocket-server docker image
   become: true
   docker_image:
-     name: elrib/aura_websocket_server
+    name: elrib/aura_websocket_server
 
 - name : Start or restart aura-websocket-server docker container
   become: true
@@ -30,4 +30,3 @@
     volumes:
       - "{{ websocket_server_data_location }}:/data/todo"
       - "{{ websocket_server_conf_location }}/wsserver.properties:/home/conf/wsserver.properties:ro"
-

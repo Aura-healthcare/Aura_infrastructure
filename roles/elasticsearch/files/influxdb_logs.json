@@ -1,0 +1,25 @@
+{
+  "index_patterns": ["logstash-*"],
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0,
+    "number_of_routing_shards": 30,
+    "refresh_interval": "5s"
+  },
+  "mappings": {
+    "doc": {
+      "properties": {
+        "nb-inserted-data": {
+          "type": "long"
+        },
+        "timestamp": {
+          "type": "date",
+          "format": "MMM dd YYYY, HH:mm:ss.SSS"
+        },
+        "input-or-output": {
+          "type": "text"
+        }
+      }
+    }
+  }
+}

@@ -24,4 +24,13 @@
       tags: monitoring_platform
     - role: data_injector
       tags: data_injector
-
+    - role: logstash
+      tags: logstash
+    - role: elasticsearch
+      tags: elasticsearch
+    - role: metricbeat
+      tags: metricbeat
+    - role: filebeat
+      tags: filebeat
+    - role: kibana
+      tags: kibana

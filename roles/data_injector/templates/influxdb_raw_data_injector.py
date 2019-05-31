@@ -25,11 +25,9 @@ DEVICE_PARAM_NAME = "device_address"
 def convert_acm_json_to_df(acm_json):
     """
     Function converting accelerometer JSON data to a pandas Dataframe
-
     Arguments
     ---------
     acm_json - Accelerometer JSON file sent from Web-socket
-
     Returns
     ---------
     df_to_write - Dataframe to write in influxDB
@@ -50,11 +48,9 @@ def convert_acm_json_to_df(acm_json):
 def convert_rri_json_to_df(rri_json):
     """
     Function converting RrInterval JSON data to a pandas Dataframe
-
     Arguments
     ---------
     acm_json - RrInterval JSON file sent from Web-socket
-
     Returns
     ---------
     df_to_write - Dataframe to write in influxDB
@@ -75,11 +71,9 @@ def convert_rri_json_to_df(rri_json):
 def convert_gyro_json_to_df(gyro_json):
     """
     Function converting gyroscope JSON data to a pandas Dataframe
-
     Arguments
     ---------
     acm_json - gyroscope JSON file sent from Web-socket
-
     Returns
     ---------
     df_to_write - Dataframe to write in influxDB
@@ -103,11 +97,9 @@ def convert_gyro_json_to_df(gyro_json):
 def create_df_with_unique_index(data_to_write):
     """
     Function creating a new Dataframe with a unique index
-
     Arguments
     ---------
     data_to_write - data to inject in influxDB
-
     Returns
     ---------
     data_with_unique_index - pandas Dataframe ith unique index to avoid overwritten points
@@ -126,13 +118,11 @@ def create_df_with_unique_index(data_to_write):
 def write_file_to_influxdb(file, path_to_data_test_directory, df_client):
     """
     Function writing JSON file to influxDB
-
     Arguments
     ---------
     file - JSON file to convert and write to InfluxDB
     path_to_data_test_directory - path for reading the JSON file
     get_tmstp - Option to extract all the timestamps of the JSON file
-
     Returns
     ---------
     write_success (Boolean) - Result of the write process
@@ -182,7 +172,6 @@ def move_processed_file(file, write_success, path_to_read_directory, path_for_wr
                         path_for_problem_files):
     """
     Function dealing with the JSON file once it is processed
-
     Arguments
     ---------
     file - JSON file processed
@@ -190,7 +179,6 @@ def move_processed_file(file, write_success, path_to_read_directory, path_for_wr
     path_to_read_directory - directory path where are JSON files
     path_for_written_files - directory where files writen in influxDB are moved
     path_for_problem_files - directory where files not correctly writen in influxDB are moved
-
     """
     if write_success:
         # move file when write is done in influxdb
@@ -204,12 +192,10 @@ def move_processed_file(file, write_success, path_to_read_directory, path_for_wr
 def test_influxdb(df_client, nb_points):
     """
     Function to test influxDB's ability to write points
-
     Arguments
     ---------
     df_client - Dataframe InfluxDB Client
     nb_points - number of points to write to influxDB in a one time try
-
     """
     # Get tags for test df
     measurement = "test"
@@ -229,15 +215,12 @@ def test_influxdb(df_client, nb_points):
 def create_files_by_user_dict(files_list: list) -> dict:
     """
     Create a dictionary containing the corresponding list of RR-inteval files for each user.
-
     Arguments
     ---------
     files_list - list of files to sort
-
     Returns
     ---------
     files_by_user_dict - sorted dictionary
-
     ex :
     files_by_user_dict = {
             'user_1': ["file_1", "file_2", "file_3"],
@@ -273,11 +256,9 @@ def create_files_by_user_dict(files_list: list) -> dict:
 def concat_files_into_dataframe(files_list: list) -> pd.DataFrame:
     """
     Concatenate JSON files content into a single pandas DataFrame.
-
     Arguments
     ---------
     files_list - list of files to sort
-
     Returns
     ---------
     concatened_dataframe - resulting pandas DataFrame
@@ -304,11 +285,9 @@ def concat_files_into_dataframe(files_list: list) -> pd.DataFrame:
 def create_corrected_timestamp_list(concatenated_df: pd.DataFrame) -> list:
     """
     Create a corrected timestamp based on cumulative sum of RR-intervals values.
-
     Arguments
     ---------
     concatenated_df - pandas DataFrame containing all data of a specific user
-
     Returns
     ---------
     corrected_timestamp_list - Corrected timestamp generated
@@ -346,7 +325,6 @@ def execute_rri_files_write_pipeline(path_to_read_directory, path_for_written_fi
                                      path_for_problems_files, df_client, verbose=False):
     """
     Process all files in the read directory to write them to influxDB.
-
     Arguments
     ---------
     path_to_read_directory - path from which we read JSON files to write into influxDB.
@@ -419,7 +397,6 @@ def execute_acm_gyro_files_write_pipeline(path_to_read_directory, path_for_writt
                                           path_for_problems_files, df_client, verbose=False):
     """
     Process all gyroscope and accelerometer files in the read directory to write them to influxDB.
-
     Arguments
     ---------
     path_to_read_directory - path from which we read JSON files to write into influxDB.

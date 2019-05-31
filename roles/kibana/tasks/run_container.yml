@@ -1,0 +1,60 @@
+---
+
+- meta: flush_handlers
+
+- name: create a network
+  become: true
+  docker_network:
+    name: "{{ item.name }}"
+  with_items: "{{ kibana_docker_networks }}"
+
+- name: set variable to add to hosts if dev environment
+  set_fact:
+    add_to_hosts_for_dev=""elasticsearch.{{ domain }}":"{{ aura_local_ip }}""
+  when: is_prod == false
+
+- name: start or restart kibana container
+  become: true
+  docker_container:
+    name: "{{ kibana_container_name }}"
+    image: kibana:{{ kibana_version }}
+    state: "{{ kibana_docker_state | default('started') }}"
+    restart: "{{ kibana_docker_restart | default(false) | bool }}"
+    networks: "{{ kibana_docker_networks }}"
+    restart_policy: "{{ kibana_container_restart_policy }}"
+    etc_hosts: >
+      {
+        {{ add_to_hosts_for_dev }}
+      }
+    volumes:
+      - "{{ kibana_conf_location }}/kibana.yml:/usr/share/kibana/config/kibana.yml:ro"
+
+- name: wait for kibana startup
+  uri:
+    url: "{{ kibana_url }}"
+    method: GET
+    status: 200
+  register: _result
+  until: _result.status == 200
+  retries: 40
+  delay: 3
+
+- name: load container monitoring dashboard with REST API
+  become: true
+  uri:
+    url: "{{ kibana_load_dashboard_url }}"
+    method: POST
+    body: "{{ lookup('file','../files/container_monitoring_dashboard.json') }}"
+    body_format: json
+    headers:
+      kbn-xsrf: true
+
+- name: load influxdb monitoring dashboard with REST API
+  become: true
+  uri:
+    url: "{{ kibana_load_dashboard_url }}"
+    method: POST
+    body: "{{ lookup('file','../files/influxdb_monitoring_dashboard.json') }}"
+    body_format: json
+    headers:
+      kbn-xsrf: true

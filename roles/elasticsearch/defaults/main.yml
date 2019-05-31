@@ -1,0 +1,35 @@
+---
+
+# Name of the elasticsearch docker container
+elasticsearch_container_name: "elasticsearch"
+
+elasticsearch_root_location: "/opt/docker-data/{{ elasticsearch_container_name }}"
+
+# Path on the host filesystem where will be the elasticsearch conf file
+elasticsearch_conf_location: "{{ elasticsearch_root_location }}/conf"
+
+# Path on the host filesystem where will be the elasticsearch data files
+elasticsearch_data_location: "{{ elasticsearch_root_location }}/data"
+
+#elasticsearch_docker_networks: []
+elasticsearch_docker_networks:
+  - name: "{{ aura_docker_network }}"
+
+elasticsearch_container_restart_policy: "always"
+
+elasticsearch_zen_minimum_master_nodes: 1
+
+elasticsearch_mv_max_map_count: 262144
+
+elasticsearch_data_location_owner: vagrant
+
+elasticsearch_data_location_group: vagrant
+
+elasticsearch_version: "6.6.2"
+
+elasticsearch_cluster_name: "docker-cluster"
+
+elasticsearch_discovery_type: "single-node"
+
+influxdb_logs_load_template_url: "http://elasticsearch.{{ domain }}/_template/logstash"
+

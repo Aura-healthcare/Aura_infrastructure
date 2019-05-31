@@ -1,0 +1,19 @@
+---
+
+- name: create metricbeat local directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: true
+  with_items:
+    - "{{ metricbeat_conf_location }}"
+
+- name: create configuration
+  become: true
+  notify: restart metricbeat
+  template:
+    src: "metricbeat.yml.j2"
+    dest: "{{ metricbeat_conf_location }}/metricbeat.yml"
+
+- include_tasks: run_container.yml

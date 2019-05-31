@@ -1,0 +1,19 @@
+---
+
+logstash_container_name: "logstash"
+
+logstash_root_location: "/opt/docker-data/{{ logstash_container_name }}"
+logstash_pipeline_location: "{{ logstash_root_location }}/pipeline"
+logs_directory_location: "{{ logstash_root_location }}/personal_logs"
+
+#logstash_docker_networks: []
+logstash_docker_networks:
+  - name: "{{ metricbeat_filebeat_logstash_docker_network }}"
+
+logstash_container_restart_policy: "always"
+
+logstash_version: "6.6.2"
+
+logstash_output: "elasticsearch.{{ domain }}:80"
+
+add_to_hosts_for_dev: ""

@@ -20,4 +20,3 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell", :privileged => true, inline: "mkdir /home/ansible/.ssh/; cat /tmp/authorized.pub >> /home/ansible/.ssh/authorized_keys"
   config.vm.provision "shell", :privileged => true, inline: "echo 'ansible ALL=(ALL) NOPASSWD:ALL' | sudo tee -a /etc/sudoers"
 end
-
